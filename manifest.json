@@ -1,0 +1,20 @@
+{
+  "name": "Moonlight Digital",
+  "short_name": "Moonlight",
+  "description": "Moonlight Digital — Communication, visibilité, promotion et distribution musicale.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "orientation": "portrait",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
