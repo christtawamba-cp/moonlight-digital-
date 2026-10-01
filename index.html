@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Moonlight Digital</title>
+  <title>Moonlight Digital | Marketing digital & visibilité</title>
+
+  <meta name="description" content="Moonlight Digital accompagne entrepreneurs, artistes et marques dans leur communication digitale, leur visibilité sur les réseaux sociaux, la promotion et la distribution musicale.">
+
+  <meta name="keywords" content="Moonlight Digital, marketing digital, communication digitale, réseaux sociaux, promotion, boostage, distribution musicale, artistes, Kinshasa">
 
   <style>
     * {
@@ -12,6 +16,10 @@
       padding: 0;
       box-sizing: border-box;
       font-family: Arial, sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
@@ -48,7 +56,7 @@
 
     .hero p {
       color: #bbb;
-      max-width: 600px;
+      max-width: 650px;
       margin: auto;
       font-size: 17px;
     }
@@ -62,6 +70,11 @@
       text-decoration: none;
       border-radius: 30px;
       font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .button:hover {
+      transform: scale(1.03);
     }
 
     .services {
@@ -83,10 +96,19 @@
     }
 
     .card {
+      display: block;
       background: #111;
       border: 1px solid #222;
       padding: 25px;
       border-radius: 15px;
+      text-decoration: none;
+      color: white;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: #555;
     }
 
     .card h3 {
@@ -98,10 +120,50 @@
       font-size: 14px;
     }
 
+    .service-details {
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .service-detail {
+      background: #0d0d0d;
+      border: 1px solid #222;
+      border-radius: 18px;
+      padding: 35px 25px;
+      margin-bottom: 30px;
+      scroll-margin-top: 20px;
+    }
+
+    .service-detail h2 {
+      font-size: 28px;
+      margin-bottom: 15px;
+    }
+
+    .service-detail h3 {
+      margin-top: 25px;
+      margin-bottom: 15px;
+    }
+
+    .service-detail p {
+      color: #bbb;
+      max-width: 750px;
+    }
+
+    .service-detail ul {
+      margin: 15px 0 0 20px;
+      color: #bbb;
+    }
+
+    .service-detail li {
+      margin-bottom: 8px;
+    }
+
     .about {
       text-align: center;
       padding: 60px 20px;
       background: #0d0d0d;
+      margin-top: 30px;
     }
 
     .about p {
@@ -116,6 +178,16 @@
       color: #777;
       font-size: 13px;
     }
+
+    @media (max-width: 600px) {
+      .hero h2 {
+        font-size: 32px;
+      }
+
+      .service-detail {
+        padding: 28px 20px;
+      }
+    }
   </style>
 </head>
 
@@ -126,19 +198,27 @@
     <span>Votre visibilité. Notre stratégie.</span>
   </header>
 
+
   <section class="hero">
+
     <h2>Faites grandir votre visibilité.</h2>
 
     <p>
       Moonlight Digital accompagne les entrepreneurs,
-      artistes et marques dans leur communication et
-      leur visibilité sur les réseaux sociaux.
+      artistes et marques dans leur communication,
+      leur visibilité et leur développement sur les réseaux sociaux.
     </p>
 
-    <a class="button" href="https://wa.me/243890385429">
+    <a class="button"
+       href="https://wa.me/243890385429?text=Bonjour%20Moonlight%20Digital%2C%20je%20souhaite%20avoir%20plus%20d%27informations%20sur%20vos%20services."
+       target="_blank">
       Nous contacter
     </a>
+
   </section>
+
+
+  <!-- NOS SERVICES -->
 
   <section class="services">
 
@@ -146,48 +226,221 @@
 
     <div class="cards">
 
-      <div class="card">
+      <a class="card" href="#reseaux-sociaux">
         <h3>📱 Réseaux sociaux</h3>
         <p>
           Gestion et développement de vos pages
           Facebook, Instagram, TikTok et WhatsApp.
         </p>
-      </div>
+      </a>
 
-      <div class="card">
+      <a class="card" href="#boostage">
         <h3>📈 Boostage</h3>
         <p>
           Augmentez la visibilité de vos publications
           et touchez davantage de personnes.
         </p>
-      </div>
+      </a>
 
-      <div class="card">
+      <a class="card" href="#promotion">
         <h3>🎯 Promotion</h3>
         <p>
           Promotion de vos produits, services,
           événements et projets.
         </p>
-      </div>
+      </a>
 
-      <div class="card">
+      <a class="card" href="#communication-digitale">
         <h3>💼 Communication digitale</h3>
         <p>
           Stratégie de contenu et accompagnement
           pour développer votre présence en ligne.
         </p>
-      </div>
-<div class="card">
-    <h3>🎵 Distribution musicale</h3>
-    <p>
-      
-        Distribution et accompagnement des artistes
-        pour diffuser leurs chansons sur les plateformes musicales.
-    </p>
-</div>
+      </a>
+
+      <a class="card" href="#distribution-musicale">
+        <h3>🎵 Distribution musicale</h3>
+        <p>
+          Distribution et accompagnement des artistes
+          pour diffuser leurs chansons sur les plateformes musicales.
+        </p>
+      </a>
 
     </div>
+
   </section>
+
+
+  <!-- DÉTAILS DES SERVICES -->
+
+  <section class="service-details">
+
+
+    <!-- RÉSEAUX SOCIAUX -->
+
+    <div class="service-detail" id="reseaux-sociaux">
+
+      <h2>📱 Réseaux sociaux</h2>
+
+      <p>
+        Moonlight Digital vous accompagne dans la gestion
+        et le développement de votre présence sur les réseaux sociaux.
+      </p>
+
+      <h3>Comment pouvons-nous vous aider ?</h3>
+
+      <ul>
+        <li>Création et optimisation de pages professionnelles</li>
+        <li>Gestion de Facebook, Instagram, TikTok et WhatsApp</li>
+        <li>Création et planification de contenus</li>
+        <li>Développement de votre communauté</li>
+        <li>Amélioration de votre visibilité en ligne</li>
+        <li>Conseils en stratégie de communication</li>
+      </ul>
+
+      <a class="button"
+         href="https://wa.me/243890385429?text=Bonjour%20Moonlight%20Digital%2C%20je%20suis%20int%C3%A9ress%C3%A9%20par%20le%20service%20R%C3%A9seaux%20sociaux."
+         target="_blank">
+        Nous contacter sur WhatsApp
+      </a>
+
+    </div>
+
+
+    <!-- BOOSTAGE -->
+
+    <div class="service-detail" id="boostage">
+
+      <h2>📈 Boostage</h2>
+
+      <p>
+        Vous souhaitez donner davantage de visibilité à vos publications
+        et atteindre une audience adaptée ?
+        Moonlight Digital peut vous accompagner dans vos campagnes de visibilité.
+      </p>
+
+      <h3>Comment pouvons-nous vous aider ?</h3>
+
+      <ul>
+        <li>Augmenter la portée de vos publications</li>
+        <li>Donner plus de visibilité à vos contenus</li>
+        <li>Promouvoir vos produits et services</li>
+        <li>Atteindre une audience adaptée</li>
+        <li>Accompagner vos campagnes publicitaires</li>
+      </ul>
+
+      <a class="button"
+         href="https://wa.me/243890385429?text=Bonjour%20Moonlight%20Digital%2C%20je%20suis%20int%C3%A9ress%C3%A9%20par%20le%20service%20de%20Boostage."
+         target="_blank">
+        Nous contacter sur WhatsApp
+      </a>
+
+    </div>
+
+
+    <!-- PROMOTION -->
+
+    <div class="service-detail" id="promotion">
+
+      <h2>🎯 Promotion</h2>
+
+      <p>
+        Faites connaître vos produits, services, événements
+        et projets auprès d'une audience adaptée.
+      </p>
+
+      <h3>Comment pouvons-nous vous aider ?</h3>
+
+      <ul>
+        <li>Promotion de vos produits</li>
+        <li>Promotion de vos services</li>
+        <li>Promotion d'événements</li>
+        <li>Promotion d'artistes et de projets</li>
+        <li>Campagnes de visibilité sur les réseaux sociaux</li>
+        <li>Mise en avant de vos offres</li>
+      </ul>
+
+      <a class="button"
+         href="https://wa.me/243890385429?text=Bonjour%20Moonlight%20Digital%2C%20je%20suis%20int%C3%A9ress%C3%A9%20par%20le%20service%20de%20Promotion."
+         target="_blank">
+        Nous contacter sur WhatsApp
+      </a>
+
+    </div>
+
+
+    <!-- COMMUNICATION DIGITALE -->
+
+    <div class="service-detail" id="communication-digitale">
+
+      <h2>💼 Communication digitale</h2>
+
+      <p>
+        Nous vous aidons à construire une présence professionnelle
+        et cohérente sur Internet grâce à une stratégie adaptée à votre activité.
+      </p>
+
+      <h3>Comment pouvons-nous vous aider ?</h3>
+
+      <ul>
+        <li>Élaboration d'une stratégie de communication</li>
+        <li>Développement d'une stratégie de contenu</li>
+        <li>Amélioration de votre image en ligne</li>
+        <li>Positionnement de votre marque</li>
+        <li>Conseils pour vos réseaux sociaux</li>
+        <li>Accompagnement dans le développement de votre visibilité</li>
+      </ul>
+
+      <a class="button"
+         href="https://wa.me/243890385429?text=Bonjour%20Moonlight%20Digital%2C%20je%20suis%20int%C3%A9ress%C3%A9%20par%20le%20service%20de%20Communication%20digitale."
+         target="_blank">
+        Nous contacter sur WhatsApp
+      </a>
+
+    </div>
+
+
+    <!-- DISTRIBUTION MUSICALE -->
+
+    <div class="service-detail" id="distribution-musicale">
+
+      <h2>🎵 Distribution musicale</h2>
+
+      <p>
+        Vous êtes artiste et vous souhaitez rendre votre musique
+        disponible sur les principales plateformes musicales ?
+        Moonlight Digital vous accompagne dans votre projet.
+      </p>
+
+      <h3>Comment pouvons-nous vous aider ?</h3>
+
+      <ul>
+        <li>Préparation de votre sortie musicale</li>
+        <li>Distribution de vos chansons sur les plateformes musicales</li>
+        <li>Accompagnement lors de la mise en ligne</li>
+        <li>Gestion des informations liées à votre sortie</li>
+        <li>Suivi de votre sortie musicale</li>
+        <li>Accompagnement après la sortie</li>
+      </ul>
+
+      <p>
+        <strong>Pour les artistes :</strong>
+        nous vous accompagnons dans les différentes étapes
+        de la distribution de votre musique.
+      </p>
+
+      <a class="button"
+         href="https://wa.me/243890385429?text=Bonjour%20Moonlight%20Digital%2C%20je%20suis%20artiste%20et%20je%20suis%20int%C3%A9ress%C3%A9%20par%20votre%20service%20de%20distribution%20musicale."
+         target="_blank">
+        Je suis artiste — Nous contacter
+      </a>
+
+    </div>
+
+  </section>
+
+
+  <!-- À PROPOS -->
 
   <section class="about">
 
@@ -201,8 +454,22 @@
 
   </section>
 
+
   <footer>
+
     © 2026 Moonlight Digital — Tous droits réservés.
+
+    Chris Tawamba
+
+    <br><br>
+
+    WhatsApp :
+    <a href="https://wa.me/243890385429"
+       target="_blank"
+       style="color:white;">
+      +243 890 385 429
+    </a>
+
   </footer>
 
 </body>
