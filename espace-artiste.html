@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050505">
+
+<title>Espace Artiste | Moonlight Digital</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #050505;
+  color: white;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  padding: 30px 10px;
+}
+
+header h1 {
+  font-size: 28px;
+  letter-spacing: 2px;
+}
+
+header h1 span {
+  color: #d4af37;
+}
+
+header p {
+  color: #999;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.container {
+  max-width: 480px;
+  margin: 25px auto;
+  background: #101010;
+  border: 1px solid #292929;
+  border-radius: 18px;
+  padding: 28px;
+}
+
+.logo {
+  text-align: center;
+  font-size: 45px;
+  margin-bottom: 10px;
+}
+
+h2 {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+
+.tabs {
+  display: flex;
+  background: #080808;
+  padding: 5px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 13px 5px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #aaa;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.tabs button.active {
+  background: #d4af37;
+  color: #050505;
+}
+
+.form {
+  display: none;
+}
+
+.form.active {
+  display: block;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: #ddd;
+}
+
+input, select {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 18px;
+  background: #080808;
+  border: 1px solid #333;
+  border-radius: 9px;
+  color: white;
+  font-size: 15px;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #d4af37;
+}
+
+.submit {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 30px;
+  background: #d4af37;
+  color: #050505;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.submit:hover {
+  background: white;
+}
+
+.notice {
+  display: none;
+  margin-top: 18px;
+  padding: 13px;
+  border-radius: 8px;
+  background: #24200e;
+  border: 1px solid #d4af37;
+  color: #f1d98a;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.back {
+  display: block;
+  text-align: center;
+  margin-top: 25px;
+  color: #d4af37;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+footer {
+  text-align: center;
+  color: #666;
+  font-size: 12px;
+  padding: 30px 10px;
+}
+
+@media(max-width: 400px) {
+  .container {
+    padding: 20px;
+  }
+
+  header h1 {
+    font-size: 24px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>MOONLIGHT <span>DIGITAL</span></h1>
+  <p>Distribution musicale professionnelle</p>
+</header>
+
+<div class="container">
+
+  <div class="logo">🌙</div>
+
+  <h2>Espace Artiste</h2>
+
+  <p class="subtitle">
+    Bienvenue sur votre espace de distribution musicale.
+  </p>
+
+  <div class="tabs">
+    <button id="loginTab" class="active" type="button">
+      Connexion
+    </button>
+
+    <button id="registerTab" type="button">
+      Inscription
+    </button>
+  </div>
+
+  <!-- CONNEXION -->
+
+  <form id="loginForm" class="form active">
+
+    <label>Adresse e-mail</label>
+    <input
+      type="email"
+      id="loginEmail"
+      placeholder="Votre adresse e-mail"
+      required
+    >
+
+    <label>Mot de passe</label>
+    <input
+      type="password"
+      id="loginPassword"
+      placeholder="Votre mot de passe"
+      required
+    >
+
+    <button type="submit" class="submit">
+      Se connecter
+    </button>
+
+  </form>
+
+  <!-- INSCRIPTION -->
+
+  <form id="registerForm" class="form">
+
+    <label>Nom de l'artiste</label>
+    <input
+      type="text"
+      id="artistName"
+      placeholder="Votre nom d'artiste"
+      required
+    >
+
+    <label>Nom complet</label>
+    <input
+      type="text"
+      id="fullName"
+      placeholder="Votre nom complet"
+      required
+    >
+
+    <label>Adresse e-mail</label>
+    <input
+      type="email"
+      id="registerEmail"
+      placeholder="Votre adresse e-mail"
+      required
+    >
+
+    <label>Numéro WhatsApp</label>
+    <input
+      type="tel"
+      id="phone"
+      placeholder="+243..."
+      required
+    >
+
+    <label>Pays</label>
+    <select id="country" required>
+      <option value="">Choisir votre pays</option>
+      <option>République démocratique du Congo</option>
+      <option>Congo-Brazzaville</option>
+      <option>Angola</option>
+      <option>Côte d'Ivoire</option>
+      <option>Cameroun</option>
+      <option>Sénégal</option>
+      <option>France</option>
+      <option>Belgique</option>
+      <option>Autre</option>
+    </select>
+
+    <label>Mot de passe</label>
+    <input
+      type="password"
+      id="registerPassword"
+      placeholder="Créer un mot de passe"
+      minlength="8"
+      required
+    >
+
+    <label>Confirmer le mot de passe</label>
+    <input
+      type="password"
+      id="confirmPassword"
+      placeholder="Confirmer le mot de passe"
+      minlength="8"
+      required
+    >
+
+    <button type="submit" class="submit">
+      Créer mon compte
+    </button>
+
+  </form>
+
+  <div class="notice" id="notice" role="status"></div>
+
+  <a href="index.html" class="back">
+    ← Retour à l'accueil
+  </a>
+
+</div>
+
+<footer>
+  © 2026 Moonlight Digital<br>
+  Tous droits réservés.
+</footer>
+
+<script>
+
+const loginTab = document.getElementById("loginTab");
+const registerTab = document.getElementById("registerTab");
+
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+
+const notice = document.getElementById("notice");
+
+function showNotice(message) {
+  notice.style.display = "block";
+  notice.textContent = message;
+}
+
+function hideNotice() {
+  notice.style.display = "none";
+}
+
+loginTab.addEventListener("click", function() {
+  loginTab.classList.add("active");
+  registerTab.classList.remove("active");
+
+  loginForm.classList.add("active");
+  registerForm.classList.remove("active");
+
+  hideNotice();
+});
+
+registerTab.addEventListener("click", function() {
+  registerTab.classList.add("active");
+  loginTab.classList.remove("active");
+
+  registerForm.classList.add("active");
+  loginForm.classList.remove("active");
+
+  hideNotice();
+});
+
+registerForm.addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const password =
+    document.getElementById("registerPassword").value;
+
+  const confirmPassword =
+    document.getElementById("confirmPassword").value;
+
+  if (password !== confirmPassword) {
+    showNotice("Les deux mots de passe ne correspondent pas.");
+    return;
+  }
+
+  showNotice(
+    "L'interface d'inscription est prête. La création réelle des comptes nécessite encore la connexion à notre base de données sécurisée."
+  );
+});
+
+loginForm.addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  showNotice(
+    "Le système de connexion sera activé après la configuration de notre base de données sécurisée."
+  );
+});
+
+</script>
+
+</body>
+</html>
