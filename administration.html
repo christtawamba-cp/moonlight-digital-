@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration | Moonlight Digital</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f5f9;color:#202938}
+header{background:#101827;color:white;padding:22px}
+header h1{margin:0;font-size:23px}
+header p{color:#cbd5e1}
+main{max-width:1050px;margin:25px auto;padding:15px}
+.panel{background:white;padding:20px;border-radius:12px;margin-bottom:20px}
+button,select{padding:12px;border-radius:7px;border:1px solid #ddd}
+button{background:#172b4d;color:white;border:0;cursor:pointer}
+.release{border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin:15px 0}
+.cover{width:110px;height:110px;object-fit:cover;border-radius:8px}
+audio{width:100%;margin:12px 0}
+.status{font-weight:bold}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.actions select{flex:1;min-width:130px}
+.hidden{display:none}
+.error{color:#b91c1c}
+.success{color:#15803d}
+</style>
+</head>
+
+<body>
+<header>
+<h1>🌙 MOONLIGHT DIGITAL</h1>
+<p>Espace administration</p>
+</header>
+
+<main>
+<section id="loading" class="panel">
+Vérification de votre accès...
+</section>
+
+<section id="dashboard" class="hidden">
+<div class="panel">
+<h2>🎵 Gestion des dépôts</h2>
+<p>Bienvenue dans votre espace administrateur.</p>
+<button id="refresh">Actualiser les projets</button>
+<button id="logout">Déconnexion</button>
+<p id="message"></p>
+</div>
+
+<div class="panel">
+<h3>📁 Projets reçus</h3>
+<div id="releases">Chargement...</div>
+</div>
+</section>
+</main>
+
+<script>
+const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
+const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
+
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const loading = document.getElementById("loading");
+const dashboard = document.getElementById("dashboard");
+const message = document.getElementById("message");
+const releasesDiv = document.getElementById("releases");
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[char]);
+}
+
+async function initialize() {
+  const {data:{session},error} = await db.auth.getSession();
+
+  if(error || !session) {
+    loading.textContent = "Connectez-vous d'abord à votre espace artiste.";
+    return;
+  }
+
+  const {data:isAdmin,error:adminError} = await db.rpc("is_admin");
+
+  if(adminError || isAdmin !== true) {
+    loading.innerHTML = '<p class="error">Accès refusé. Cette page est réservée aux administrateurs.</p>';
+    return;
+  }
+
+  loading.classList.add("hidden");
+  dashboard.classList.remove("hidden");
+
+  await loadReleases();
+}
+
+async function loadReleases() {
+  releasesDiv.textContent = "Chargement des projets...";
+
+  const {data:releases,error} = await db
+    .from("releases")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error) {
+    releasesDiv.innerHTML = '<p class="error">Erreur : '+escapeHTML(error.message)+'</p>';
+    return;
+  }
+
+  if(!releases || releases.length === 0) {
+    releasesDiv.textContent = "Aucun projet reçu pour le moment.";
+    return;
+  }
+
+  const {data:profiles} = await db
+    .from("profiles")
+    .select("id,full_name,artist_name");
+
+  const profileMap = {};
+  (profiles || []).forEach(p => profileMap[p.id] = p);
+
+  releasesDiv.innerHTML = "";
+
+  for(const release of releases) {
+    const profile = profileMap[release.user_id] || {};
+    const artist = profile.artist_name || release.artist_name || profile.full_name || "Artiste";
+
+    let audioHTML = "Audio non disponible";
+    let coverHTML = "";
+
+    if(release.audio_path) {
+      const {data} = await db.storage
+        .from("releases-audio")
+        .createSignedUrl(release.audio_path,3600);
+
+      if(data?.signedUrl) {
+        audioHTML = '<audio controls src="'+escapeHTML(data.signedUrl)+'"></audio>';
+      }
+    }
+
+    if(release.cover_path) {
+      const {data} = await db.storage
+        .from("releases-covers")
+        .createSignedUrl(release.cover_path,3600);
+
+      if(data?.signedUrl) {
+        coverHTML = '<img class="cover" src="'+escapeHTML(data.signedUrl)+'" alt="Pochette">';
+      }
+    }
+
+    const card = document.createElement("div");
+    card.className = "release";
+
+    card.innerHTML = `
+      <h3>${escapeHTML(release.title)}</h3>
+      <p><strong>Artiste :</strong> ${escapeHTML(artist)}</p>
+      <p><strong>Type :</strong> ${escapeHTML(release.release_type)}</p>
+      <p><strong>Date de sortie :</strong> ${escapeHTML(release.release_date || "Non précisée")}</p>
+      <p><strong>Statut :</strong> <span class="status">${escapeHTML(release.status)}</span></p>
+      ${coverHTML}
+      ${audioHTML}
+      <div class="actions">
+        <select aria-label="Nouveau statut">
+          <option value="pending">En attente</option>
+          <option value="validated">Validé</option>
+          <option value="rejected">Refusé</option>
+          <option value="distributed">Distribué</option>
+        </select>
+        <button type="button">Enregistrer le statut</button>
+      </div>
+    `;
+
+    const select = card.querySelector("select");
+    const saveButton = card.querySelector("button");
+
+    select.value = release.status || "pending";
+
+    saveButton.addEventListener("click", async () => {
+      saveButton.disabled = true;
+      saveButton.textContent = "Enregistrement...";
+
+      const {error:updateError} = await db
+        .from("releases")
+        .update({status:select.value})
+        .eq("id",release.id);
+
+      if(updateError) {
+        message.className = "error";
+        message.textContent = "Erreur : " + updateError.message;
+      } else {
+        message.className = "success";
+        message.textContent = "Statut du projet mis à jour !";
+        card.querySelector(".status").textContent = select.value;
+      }
+
+      saveButton.disabled = false;
+      saveButton.textContent = "Enregistrer le statut";
+    });
+
+    releasesDiv.appendChild(card);
+  }
+}
+
+document.getElementById("refresh").addEventListener("click",loadReleases);
+
+document.getElementById("logout").addEventListener("click",async()=>{
+  await db.auth.signOut();
+  window.location.href = "espace-artiste.html";
+});
+
+initialize();
+</script>
+</body>
+</html>
