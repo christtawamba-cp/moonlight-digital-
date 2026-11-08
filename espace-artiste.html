@@ -149,23 +149,24 @@ input:focus, select:focus {
 .notice {
   display: none;
   margin-top: 18px;
-  padding: 15px;
+  padding: 18px;
   border-radius: 8px;
   background: #24200e;
   border: 1px solid #d4af37;
   color: #f1d98a;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
   overflow-wrap: anywhere;
+  text-align: center;
 }
 
 .dashboard-link {
-  display: inline-block;
-  margin-top: 15px;
-  padding: 14px 20px;
+  display: block;
+  margin-top: 18px;
+  padding: 15px 12px;
   background: #d4af37;
   color: #050505;
-  border-radius: 8px;
+  border-radius: 9px;
   text-decoration: none;
   font-weight: bold;
   text-align: center;
@@ -232,7 +233,7 @@ footer {
 
   </div>
 
-  <!-- FORMULAIRE DE CONNEXION -->
+  <!-- CONNEXION -->
 
   <form id="loginForm" class="form active">
 
@@ -262,7 +263,7 @@ footer {
 
   </form>
 
-  <!-- FORMULAIRE D'INSCRIPTION -->
+  <!-- INSCRIPTION -->
 
   <form id="registerForm" class="form">
 
@@ -307,7 +308,6 @@ footer {
     <label>Pays</label>
 
     <select id="country" required>
-
       <option value="">Choisir votre pays</option>
       <option value="République démocratique du Congo">République démocratique du Congo</option>
       <option value="Congo-Brazzaville">Congo-Brazzaville</option>
@@ -318,7 +318,6 @@ footer {
       <option value="France">France</option>
       <option value="Belgique">Belgique</option>
       <option value="Autre">Autre</option>
-
     </select>
 
     <label>Mot de passe</label>
@@ -362,15 +361,11 @@ footer {
   Tous droits réservés.
 </footer>
 
-<!-- BIBLIOTHEQUE SUPABASE -->
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
-/* =====================================
-   CONNEXION À SUPABASE
-===================================== */
+/* CONNEXION SUPABASE */
 
 const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
 
@@ -381,9 +376,7 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_KEY
 );
 
-/* =====================================
-   ELEMENTS DE LA PAGE
-===================================== */
+/* ELEMENTS */
 
 const loginTab = document.getElementById("loginTab");
 const registerTab = document.getElementById("registerTab");
@@ -393,9 +386,7 @@ const registerForm = document.getElementById("registerForm");
 
 const notice = document.getElementById("notice");
 
-/* =====================================
-   NOTIFICATIONS
-===================================== */
+/* NOTIFICATIONS */
 
 function showNotice(message) {
   notice.style.display = "block";
@@ -404,40 +395,32 @@ function showNotice(message) {
 
 function hideNotice() {
   notice.style.display = "none";
-  notice.textContent = "";
+  notice.innerHTML = "";
 }
 
-/* =====================================
-   MESSAGE DE CONNEXION REUSSIE
-===================================== */
+/* AFFICHER LE BOUTON DU TABLEAU DE BORD */
 
 function showLoginSuccess(artistName) {
 
   notice.style.display = "block";
-  notice.innerHTML = "";
 
-  const title = document.createElement("h3");
-  title.style.color = "#d4af37";
-  title.style.marginBottom = "8px";
-  title.textContent = "Bienvenue " + artistName + " !";
+  notice.innerHTML = `
+    <h3 style="color:#d4af37; margin-bottom:10px;">
+      Bienvenue ${artistName} !
+    </h3>
 
-  const message = document.createElement("p");
-  message.textContent =
-    "Votre connexion à Moonlight Digital est réussie.";
+    <p>
+      Votre connexion à Moonlight Digital est réussie.
+    </p>
 
-  const button = document.createElement("a");
-  button.href = "dashboard.html";
-  button.className = "dashboard-link";
-  button.textContent = "Accéder à mon tableau de bord";
+    <a href="dashboard.html" class="dashboard-link">
+      Accéder à mon tableau de bord
+    </a>
+  `;
 
-  notice.appendChild(title);
-  notice.appendChild(message);
-  notice.appendChild(button);
 }
 
-/* =====================================
-   CHANGEMENT DES FORMULAIRES
-===================================== */
+/* CHANGEMENT DES FORMULAIRES */
 
 loginTab.addEventListener("click", function() {
 
@@ -463,35 +446,20 @@ registerTab.addEventListener("click", function() {
 
 });
 
-/* =====================================
-   INSCRIPTION D'UN ARTISTE
-===================================== */
+/* INSCRIPTION */
 
 registerForm.addEventListener("submit", async function(e) {
 
   e.preventDefault();
   hideNotice();
 
-  const artistName =
-    document.getElementById("artistName").value.trim();
-
-  const fullName =
-    document.getElementById("fullName").value.trim();
-
-  const email =
-    document.getElementById("registerEmail").value.trim();
-
-  const phone =
-    document.getElementById("phone").value.trim();
-
-  const country =
-    document.getElementById("country").value;
-
-  const password =
-    document.getElementById("registerPassword").value;
-
-  const confirmPassword =
-    document.getElementById("confirmPassword").value;
+  const artistName = document.getElementById("artistName").value.trim();
+  const fullName = document.getElementById("fullName").value.trim();
+  const email = document.getElementById("registerEmail").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const country = document.getElementById("country").value;
+  const password = document.getElementById("registerPassword").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
 
   if (password !== confirmPassword) {
     showNotice("Les deux mots de passe ne correspondent pas.");
@@ -516,21 +484,17 @@ registerForm.addEventListener("submit", async function(e) {
       password: password,
 
       options: {
-
         data: {
           artist_name: artistName,
           full_name: fullName,
           phone: phone,
           country: country
         }
-
       }
 
     });
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     registerForm.reset();
 
@@ -561,20 +525,15 @@ registerForm.addEventListener("submit", async function(e) {
 
 });
 
-/* =====================================
-   CONNEXION D'UN ARTISTE
-===================================== */
+/* CONNEXION */
 
 loginForm.addEventListener("submit", async function(e) {
 
   e.preventDefault();
   hideNotice();
 
-  const email =
-    document.getElementById("loginEmail").value.trim();
-
-  const password =
-    document.getElementById("loginPassword").value;
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
 
   const button = loginForm.querySelector(".submit");
 
@@ -585,15 +544,11 @@ loginForm.addEventListener("submit", async function(e) {
 
     const { data, error } =
       await supabaseClient.auth.signInWithPassword({
-
         email: email,
         password: password
-
       });
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     const artistName =
       data.user.user_metadata.artist_name || "Artiste";
