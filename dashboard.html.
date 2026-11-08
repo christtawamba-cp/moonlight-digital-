@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moonlight Digital | Espace Artiste</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #080808;
+    color: white;
+}
+
+header {
+    background: #111;
+    padding: 20px;
+    border-bottom: 1px solid #c9a227;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    color: #d4af37;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.logout {
+    background: #c9a227;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 25px 18px;
+}
+
+.welcome {
+    background: linear-gradient(120deg, #242018, #111);
+    padding: 28px;
+    border: 1px solid #a98726;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+.welcome h1 {
+    color: #d4af37;
+    margin-bottom: 10px;
+}
+
+.welcome p {
+    color: #ccc;
+    line-height: 1.6;
+}
+
+.section-title {
+    margin: 25px 0 15px;
+    color: #d4af37;
+}
+
+.profile {
+    background: #151515;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    line-height: 2;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+.card {
+    background: #151515;
+    padding: 22px;
+    border: 1px solid #333;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.card:hover {
+    border-color: #d4af37;
+    transform: translateY(-3px);
+}
+
+.card h3 {
+    color: #d4af37;
+    margin-bottom: 12px;
+}
+
+.card p {
+    color: #bbb;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.badge {
+    display: inline-block;
+    margin-top: 15px;
+    color: #d4af37;
+    font-size: 12px;
+}
+
+footer {
+    text-align: center;
+    padding: 30px 15px;
+    color: #777;
+    font-size: 13px;
+    margin-top: 40px;
+}
+
+#message {
+    padding: 15px;
+    color: #ffcc66;
+    text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">🌙 MOONLIGHT DIGITAL</div>
+    <button class="logout" onclick="logout()">Déconnexion</button>
+</header>
+
+<div class="container">
+
+    <div id="message">Chargement de votre espace artiste...</div>
+
+    <div id="dashboard" style="display:none;">
+
+        <section class="welcome">
+            <h1>Bienvenue, <span id="artistName">Artiste</span> !</h1>
+            <p>
+                Bienvenue dans votre espace personnel Moonlight Digital.
+                Gérez votre carrière musicale depuis un seul endroit.
+            </p>
+        </section>
+
+        <h2 class="section-title">👤 Mon profil</h2>
+
+        <section class="profile">
+            <p><strong>Nom d'artiste :</strong> <span id="artist">-</span></p>
+            <p><strong>Nom complet :</strong> <span id="fullname">-</span></p>
+            <p><strong>Téléphone :</strong> <span id="phone">-</span></p>
+            <p><strong>Pays :</strong> <span id="country">-</span></p>
+        </section>
+
+        <h2 class="section-title">🎵 Mon espace musical</h2>
+
+        <section class="cards">
+
+            <div class="card">
+                <h3>🎧 Ajouter une musique</h3>
+                <p>Préparez le dépôt de vos singles, EP et albums.</p>
+                <span class="badge">Bientôt disponible</span>
+            </div>
+
+            <div class="card">
+                <h3>💿 Mes sorties</h3>
+                <p>Retrouvez vos projets musicaux et leur statut.</p>
+                <span class="badge">Bientôt disponible</span>
+            </div>
+
+            <div class="card">
+                <h3>📊 Mes statistiques</h3>
+                <p>Suivez les performances de vos productions.</p>
+                <span class="badge">Bientôt disponible</span>
+            </div>
+
+            <div class="card">
+                <h3>💰 Mes revenus</h3>
+                <p>Consultez vos revenus générés par la musique.</p>
+                <span class="badge">Bientôt disponible</span>
+            </div>
+
+            <div class="card">
+                <h3>🏦 Mes paiements</h3>
+                <p>Consultez vos demandes et historiques de paiement.</p>
+                <span class="badge">Bientôt disponible</span>
+            </div>
+
+            <div class="card">
+                <h3>⚙️ Paramètres</h3>
+                <p>La gestion de votre compte sera disponible ici.</p>
+                <span class="badge">Bientôt disponible</span>
+            </div>
+
+        </section>
+
+    </div>
+</div>
+
+<footer>
+    © 2026 Moonlight Digital — Distribution musicale
+</footer>
+
+<script>
+const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
+
+const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+async function loadDashboard() {
+    const message = document.getElementById("message");
+
+    try {
+        const { data: { session }, error: sessionError } =
+            await client.auth.getSession();
+
+        if (sessionError) throw sessionError;
+
+        if (!session) {
+            window.location.href = "espace-artiste.html";
+            return;
+        }
+
+        const user = session.user;
+
+        const { data: profile, error } = await client
+            .from("profiles")
+            .select("full_name, artist_name, phone, country, role")
+            .eq("id", user.id)
+            .maybeSingle();
+
+        if (error) throw error;
+
+        const metadata = user.user_metadata || {};
+
+        const artistName =
+            profile?.artist_name ||
+            metadata.artist_name ||
+            profile?.full_name ||
+            metadata.full_name ||
+            "Artiste";
+
+        document.getElementById("artistName").textContent = artistName;
+        document.getElementById("artist").textContent =
+            profile?.artist_name || metadata.artist_name || "Non renseigné";
+
+        document.getElementById("fullname").textContent =
+            profile?.full_name || metadata.full_name || "Non renseigné";
+
+        document.getElementById("phone").textContent =
+            profile?.phone || metadata.phone || "Non renseigné";
+
+        document.getElementById("country").textContent =
+            profile?.country || metadata.country || "RDC";
+
+        message.style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+
+    } catch (error) {
+        message.textContent =
+            "Impossible de charger votre espace : " + error.message;
+    }
+}
+
+async function logout() {
+    const { error } = await client.auth.signOut();
+
+    if (error) {
+        alert("Erreur lors de la déconnexion : " + error.message);
+        return;
+    }
+
+    window.location.href = "espace-artiste.html";
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>
