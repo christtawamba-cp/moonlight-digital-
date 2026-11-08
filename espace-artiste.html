@@ -149,7 +149,7 @@ input:focus, select:focus {
 .notice {
   display: none;
   margin-top: 18px;
-  padding: 13px;
+  padding: 15px;
   border-radius: 8px;
   background: #24200e;
   border: 1px solid #d4af37;
@@ -157,6 +157,22 @@ input:focus, select:focus {
   font-size: 13px;
   line-height: 1.6;
   overflow-wrap: anywhere;
+}
+
+.dashboard-link {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 14px 20px;
+  background: #d4af37;
+  color: #050505;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  text-align: center;
+}
+
+.dashboard-link:hover {
+  background: white;
 }
 
 .back {
@@ -392,6 +408,34 @@ function hideNotice() {
 }
 
 /* =====================================
+   MESSAGE DE CONNEXION REUSSIE
+===================================== */
+
+function showLoginSuccess(artistName) {
+
+  notice.style.display = "block";
+  notice.innerHTML = "";
+
+  const title = document.createElement("h3");
+  title.style.color = "#d4af37";
+  title.style.marginBottom = "8px";
+  title.textContent = "Bienvenue " + artistName + " !";
+
+  const message = document.createElement("p");
+  message.textContent =
+    "Votre connexion à Moonlight Digital est réussie.";
+
+  const button = document.createElement("a");
+  button.href = "dashboard.html";
+  button.className = "dashboard-link";
+  button.textContent = "Accéder à mon tableau de bord";
+
+  notice.appendChild(title);
+  notice.appendChild(message);
+  notice.appendChild(button);
+}
+
+/* =====================================
    CHANGEMENT DES FORMULAIRES
 ===================================== */
 
@@ -539,12 +583,13 @@ loginForm.addEventListener("submit", async function(e) {
 
   try {
 
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
+    const { data, error } =
+      await supabaseClient.auth.signInWithPassword({
 
-      email: email,
-      password: password
+        email: email,
+        password: password
 
-    });
+      });
 
     if (error) {
       throw error;
@@ -553,9 +598,7 @@ loginForm.addEventListener("submit", async function(e) {
     const artistName =
       data.user.user_metadata.artist_name || "Artiste";
 
-    showNotice(
-      "Bienvenue " + artistName + " ! Votre connexion à Moonlight Digital est réussie."
-    );
+    showLoginSuccess(artistName);
 
   } catch (error) {
 
