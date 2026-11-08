@@ -141,6 +141,11 @@ input:focus, select:focus {
   background: white;
 }
 
+.submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .notice {
   display: none;
   margin-top: 18px;
@@ -151,6 +156,7 @@ input:focus, select:focus {
   color: #f1d98a;
   font-size: 13px;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .back {
@@ -199,6 +205,7 @@ footer {
   </p>
 
   <div class="tabs">
+
     <button id="loginTab" class="active" type="button">
       Connexion
     </button>
@@ -206,25 +213,30 @@ footer {
     <button id="registerTab" type="button">
       Inscription
     </button>
+
   </div>
 
-  <!-- CONNEXION -->
+  <!-- FORMULAIRE DE CONNEXION -->
 
   <form id="loginForm" class="form active">
 
     <label>Adresse e-mail</label>
+
     <input
       type="email"
       id="loginEmail"
       placeholder="Votre adresse e-mail"
+      autocomplete="email"
       required
     >
 
     <label>Mot de passe</label>
+
     <input
       type="password"
       id="loginPassword"
       placeholder="Votre mot de passe"
+      autocomplete="current-password"
       required
     >
 
@@ -234,11 +246,12 @@ footer {
 
   </form>
 
-  <!-- INSCRIPTION -->
+  <!-- FORMULAIRE D'INSCRIPTION -->
 
   <form id="registerForm" class="form">
 
     <label>Nom de l'artiste</label>
+
     <input
       type="text"
       id="artistName"
@@ -247,22 +260,27 @@ footer {
     >
 
     <label>Nom complet</label>
+
     <input
       type="text"
       id="fullName"
       placeholder="Votre nom complet"
+      autocomplete="name"
       required
     >
 
     <label>Adresse e-mail</label>
+
     <input
       type="email"
       id="registerEmail"
       placeholder="Votre adresse e-mail"
+      autocomplete="email"
       required
     >
 
     <label>Numéro WhatsApp</label>
+
     <input
       type="tel"
       id="phone"
@@ -271,34 +289,41 @@ footer {
     >
 
     <label>Pays</label>
+
     <select id="country" required>
+
       <option value="">Choisir votre pays</option>
-      <option>République démocratique du Congo</option>
-      <option>Congo-Brazzaville</option>
-      <option>Angola</option>
-      <option>Côte d'Ivoire</option>
-      <option>Cameroun</option>
-      <option>Sénégal</option>
-      <option>France</option>
-      <option>Belgique</option>
-      <option>Autre</option>
+      <option value="République démocratique du Congo">République démocratique du Congo</option>
+      <option value="Congo-Brazzaville">Congo-Brazzaville</option>
+      <option value="Angola">Angola</option>
+      <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+      <option value="Cameroun">Cameroun</option>
+      <option value="Sénégal">Sénégal</option>
+      <option value="France">France</option>
+      <option value="Belgique">Belgique</option>
+      <option value="Autre">Autre</option>
+
     </select>
 
     <label>Mot de passe</label>
+
     <input
       type="password"
       id="registerPassword"
       placeholder="Créer un mot de passe"
       minlength="8"
+      autocomplete="new-password"
       required
     >
 
     <label>Confirmer le mot de passe</label>
+
     <input
       type="password"
       id="confirmPassword"
       placeholder="Confirmer le mot de passe"
       minlength="8"
+      autocomplete="new-password"
       required
     >
 
@@ -321,7 +346,28 @@ footer {
   Tous droits réservés.
 </footer>
 
+<!-- BIBLIOTHEQUE SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
+
+/* =====================================
+   CONNEXION À SUPABASE
+===================================== */
+
+const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+/* =====================================
+   ELEMENTS DE LA PAGE
+===================================== */
 
 const loginTab = document.getElementById("loginTab");
 const registerTab = document.getElementById("registerTab");
@@ -331,6 +377,10 @@ const registerForm = document.getElementById("registerForm");
 
 const notice = document.getElementById("notice");
 
+/* =====================================
+   NOTIFICATIONS
+===================================== */
+
 function showNotice(message) {
   notice.style.display = "block";
   notice.textContent = message;
@@ -338,9 +388,15 @@ function showNotice(message) {
 
 function hideNotice() {
   notice.style.display = "none";
+  notice.textContent = "";
 }
 
+/* =====================================
+   CHANGEMENT DES FORMULAIRES
+===================================== */
+
 loginTab.addEventListener("click", function() {
+
   loginTab.classList.add("active");
   registerTab.classList.remove("active");
 
@@ -348,9 +404,11 @@ loginTab.addEventListener("click", function() {
   registerForm.classList.remove("active");
 
   hideNotice();
+
 });
 
 registerTab.addEventListener("click", function() {
+
   registerTab.classList.add("active");
   loginTab.classList.remove("active");
 
@@ -358,10 +416,32 @@ registerTab.addEventListener("click", function() {
   loginForm.classList.remove("active");
 
   hideNotice();
+
 });
 
-registerForm.addEventListener("submit", function(e) {
+/* =====================================
+   INSCRIPTION D'UN ARTISTE
+===================================== */
+
+registerForm.addEventListener("submit", async function(e) {
+
   e.preventDefault();
+  hideNotice();
+
+  const artistName =
+    document.getElementById("artistName").value.trim();
+
+  const fullName =
+    document.getElementById("fullName").value.trim();
+
+  const email =
+    document.getElementById("registerEmail").value.trim();
+
+  const phone =
+    document.getElementById("phone").value.trim();
+
+  const country =
+    document.getElementById("country").value;
 
   const password =
     document.getElementById("registerPassword").value;
@@ -374,17 +454,120 @@ registerForm.addEventListener("submit", function(e) {
     return;
   }
 
-  showNotice(
-    "L'interface d'inscription est prête. La création réelle des comptes nécessite encore la connexion à notre base de données sécurisée."
-  );
+  if (password.length < 8) {
+    showNotice("Le mot de passe doit contenir au moins 8 caractères.");
+    return;
+  }
+
+  const button = registerForm.querySelector(".submit");
+
+  button.disabled = true;
+  button.textContent = "Création du compte...";
+
+  try {
+
+    const { data, error } = await supabaseClient.auth.signUp({
+
+      email: email,
+      password: password,
+
+      options: {
+
+        data: {
+          artist_name: artistName,
+          full_name: fullName,
+          phone: phone,
+          country: country
+        }
+
+      }
+
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    registerForm.reset();
+
+    if (data.session) {
+
+      showNotice(
+        "Félicitations ! Votre compte artiste a été créé. Vous êtes maintenant inscrit sur Moonlight Digital."
+      );
+
+    } else {
+
+      showNotice(
+        "Votre inscription a été enregistrée ! Consultez votre boîte e-mail pour confirmer votre adresse avant de vous connecter."
+      );
+
+    }
+
+  } catch (error) {
+
+    showNotice("Erreur lors de l'inscription : " + error.message);
+
+  } finally {
+
+    button.disabled = false;
+    button.textContent = "Créer mon compte";
+
+  }
+
 });
 
-loginForm.addEventListener("submit", function(e) {
-  e.preventDefault();
+/* =====================================
+   CONNEXION D'UN ARTISTE
+===================================== */
 
-  showNotice(
-    "Le système de connexion sera activé après la configuration de notre base de données sécurisée."
-  );
+loginForm.addEventListener("submit", async function(e) {
+
+  e.preventDefault();
+  hideNotice();
+
+  const email =
+    document.getElementById("loginEmail").value.trim();
+
+  const password =
+    document.getElementById("loginPassword").value;
+
+  const button = loginForm.querySelector(".submit");
+
+  button.disabled = true;
+  button.textContent = "Connexion...";
+
+  try {
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+
+      email: email,
+      password: password
+
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    const artistName =
+      data.user.user_metadata.artist_name || "Artiste";
+
+    showNotice(
+      "Bienvenue " + artistName + " ! Votre connexion à Moonlight Digital est réussie."
+    );
+
+  } catch (error) {
+
+    showNotice("Erreur de connexion : " + error.message);
+
+  } finally {
+
+    button.disabled = false;
+    button.textContent = "Se connecter";
+
+  }
+
 });
 
 </script>
