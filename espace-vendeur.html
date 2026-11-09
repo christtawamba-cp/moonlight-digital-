@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace vendeur | Moonlight Digital</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f5f9;
+    color: #222;
+}
+
+header {
+    background: #10152b;
+    color: white;
+    padding: 22px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    color: #f4bd45;
+}
+
+.container {
+    max-width: 750px;
+    margin: 25px auto;
+    padding: 15px;
+}
+
+.card {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 12px #0000000d;
+}
+
+h2 {
+    color: #10152b;
+    font-size: 20px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 13px;
+    margin: 8px 0 15px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    font-size: 15px;
+}
+
+button {
+    background: #10152b;
+    color: white;
+    padding: 13px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #252e50;
+}
+
+.gold {
+    color: #f4bd45;
+}
+
+.logout {
+    background: #bd3434;
+}
+
+.product {
+    border: 1px solid #eee;
+    padding: 12px;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+.product img {
+    width: 100%;
+    max-height: 230px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.hidden {
+    display: none;
+}
+
+#message {
+    padding: 10px;
+    border-radius: 7px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #777;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🌙 MOONLIGHT DIGITAL</h1>
+    <p>Espace vendeur – Marketplace</p>
+</header>
+
+<div class="container">
+
+<div id="authSection" class="card">
+
+<h2>Bienvenue sur Moonlight Digital</h2>
+
+<div id="message"></div>
+
+<h3>Créer un compte vendeur</h3>
+
+<input id="signupName" placeholder="Votre nom complet">
+
+<input id="signupShop" placeholder="Nom de votre boutique">
+
+<input id="signupWhatsapp" placeholder="Numéro WhatsApp">
+
+<input id="signupEmail" type="email" placeholder="Adresse email">
+
+<input id="signupPassword" type="password" placeholder="Mot de passe">
+
+<button onclick="signup()">Créer mon compte</button>
+
+<hr style="margin:25px 0;">
+
+<h3>Déjà vendeur ? Connectez-vous</h3>
+
+<input id="loginEmail" type="email" placeholder="Adresse email">
+
+<input id="loginPassword" type="password" placeholder="Mot de passe">
+
+<button onclick="login()">Se connecter</button>
+
+</div>
+
+
+<div id="dashboard" class="hidden">
+
+<div class="card">
+
+<h2>Bienvenue dans votre boutique ! 🛍️</h2>
+
+<p id="sellerInfo"></p>
+
+<button class="logout" onclick="logout()">Déconnexion</button>
+
+</div>
+
+
+<div class="card">
+
+<h2>Publier un produit</h2>
+
+<input id="productName" placeholder="Nom du produit">
+
+<textarea id="productDescription" placeholder="Description du produit"></textarea>
+
+<input id="productPrice" type="number" min="0.01" step="0.01" placeholder="Prix en dollars ($)">
+
+<select id="productCategory">
+<option value="">Choisir une catégorie</option>
+<option>Vêtements</option>
+<option>Chaussures</option>
+<option>Téléphones et accessoires</option>
+<option>Informatique</option>
+<option>Électronique</option>
+<option>Beauté</option>
+<option>Maison</option>
+<option>Alimentation</option>
+<option>Autres</option>
+</select>
+
+<input id="productStock" type="number" min="1" value="1" placeholder="Quantité disponible">
+
+<label>Photo du produit</label>
+<input id="productImage" type="file" accept="image/jpeg,image/png,image/webp">
+
+<button onclick="publishProduct()">Publier mon produit</button>
+
+</div>
+
+
+<div class="card">
+
+<h2>Mes produits publiés</h2>
+
+<div id="myProducts"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<footer>
+© 2026 Moonlight Digital – Tous droits réservés.
+<br>
+Votre commerce, notre plateforme.
+</footer>
+
+
+<script>
+
+// CONFIGURATION SUPABASE
+
+const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
+
+const db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+let currentUser = null;
+
+
+// MESSAGE
+
+function showMessage(message) {
+    document.getElementById("message").innerText = message;
+}
+
+
+// INSCRIPTION
+
+async function signup() {
+
+    const name = document.getElementById("signupName").value.trim();
+    const shop = document.getElementById("signupShop").value.trim();
+    const whatsapp = document.getElementById("signupWhatsapp").value.trim();
+    const email = document.getElementById("signupEmail").value.trim();
+    const password = document.getElementById("signupPassword").value;
+
+    if (!name || !shop || !whatsapp || !email || !password) {
+        showMessage("Veuillez remplir tous les champs.");
+        return;
+    }
+
+    if (password.length < 6) {
+        showMessage("Le mot de passe doit contenir au moins 6 caractères.");
+        return;
+    }
+
+    const { data, error } = await db.auth.signUp({
+        email,
+        password
+    });
+
+    if (error) {
+        showMessage(error.message);
+        return;
+    }
+
+    if (data.session) {
+        await saveProfile(name, shop, whatsapp, email);
+    } else {
+        showMessage("Compte créé ! Vérifiez votre email, puis connectez-vous pour terminer votre inscription.");
+    }
+}
+
+
+// ENREGISTRER LE PROFIL
+
+async function saveProfile(name, shop, whatsapp, email) {
+
+    const { error } = await db
+        .from("seller_profiles")
+        .upsert({
+            id: currentUser.id,
+            full_name: name,
+            shop_name: shop,
+            whatsapp: whatsapp,
+            email: email
+        });
+
+    if (error) {
+        showMessage("Erreur profil : " + error.message);
+        return;
+    }
+
+    showMessage("Votre boutique est créée !");
+
+    openDashboard();
+}
+
+
+// CONNEXION
+
+async function login() {
+
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+
+    const { data, error } = await db.auth.signInWithPassword({
+        email,
+        password
+    });
+
+    if (error) {
+        showMessage(error.message);
+        return;
+    }
+
+    currentUser = data.user;
+
+    openDashboard();
+}
+
+
+// TABLEAU DE BORD
+
+async function openDashboard() {
+
+    document.getElementById("authSection").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+
+    const { data: profile } = await db
+        .from("seller_profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+    if (!profile) {
+        document.getElementById("sellerInfo").innerText =
+            "Finalisez votre profil vendeur.";
+
+        return;
+    }
+
+    document.getElementById("sellerInfo").innerText =
+        "Boutique : " + profile.shop_name;
+
+    loadProducts();
+}
+
+
+// PUBLICATION PRODUIT
+
+async function publishProduct() {
+
+    if (!currentUser) return;
+
+    const name = document.getElementById("productName").value.trim();
+    const description = document.getElementById("productDescription").value.trim();
+    const price = Number(document.getElementById("productPrice").value);
+    const category = document.getElementById("productCategory").value;
+    const stock = Number(document.getElementById("productStock").value);
+    const file = document.getElementById("productImage").files[0];
+
+    if (!name || !category || !file || !Number.isFinite(price) || price <= 0 || !Number.isInteger(stock) || stock < 1) {
+        alert("Veuillez remplir correctement tous les champs et choisir une photo.");
+        return;
+    }
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    if (!allowedTypes.includes(file.type)) {
+        alert("Format accepté : JPG, PNG ou WEBP.");
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        alert("La photo ne doit pas dépasser 5 MB.");
+        return;
+    }
+
+    const extension = file.name.split(".").pop().toLowerCase();
+
+    const path = currentUser.id + "/" + crypto.randomUUID() + "." + extension;
+
+    const { error: uploadError } = await db.storage
+        .from("products-images")
+        .upload(path, file);
+
+    if (uploadError) {
+        alert("Erreur photo : " + uploadError.message);
+        return;
+    }
+
+    const { data: imageData } = db.storage
+        .from("products-images")
+        .getPublicUrl(path);
+
+    const { error } = await db
+        .from("products")
+        .insert({
+            seller_id: currentUser.id,
+            name: name,
+            description: description,
+            price: price,
+            category: category,
+            image_url: imageData.publicUrl,
+            stock: stock,
+            status: "active"
+        });
+
+    if (error) {
+        await db.storage.from("products-images").remove([path]);
+        alert("Erreur : " + error.message);
+        return;
+    }
+
+    alert("Produit publié avec succès ! 🎉");
+
+    document.getElementById("productName").value = "";
+    document.getElementById("productDescription").value = "";
+    document.getElementById("productPrice").value = "";
+    document.getElementById("productCategory").value = "";
+    document.getElementById("productStock").value = "1";
+    document.getElementById("productImage").value = "";
+
+    loadProducts();
+}
+
+
+// AFFICHER LES PRODUITS
+
+async function loadProducts() {
+
+    const { data, error } = await db
+        .from("products")
+        .select("*")
+        .eq("seller_id", currentUser.id)
+        .order("created_at", { ascending: false });
+
+    const container = document.getElementById("myProducts");
+
+    if (error) {
+        container.innerText = error.message;
+        return;
+    }
+
+    container.innerHTML = "";
+
+    if (!data || data.length === 0) {
+        container.innerHTML = "<p>Vous n'avez pas encore publié de produit.</p>";
+        return;
+    }
+
+    data.forEach(product => {
+
+        const div = document.createElement("div");
+        div.className = "product";
+
+        const img = document.createElement("img");
+        img.src = product.image_url;
+        img.alt = product.name;
+
+        const title = document.createElement("h3");
+        title.textContent = product.name;
+
+        const price = document.createElement("p");
+        price.textContent = product.price + " $";
+
+        const category = document.createElement("p");
+        category.textContent = "Catégorie : " + product.category;
+
+        const stock = document.createElement("p");
+        stock.textContent = "Stock : " + product.stock;
+
+        const remove = document.createElement("button");
+        remove.textContent = "Supprimer";
+        remove.style.background = "#bd3434";
+        remove.onclick = () => deleteProduct(product.id);
+
+        div.append(img, title, price, category, stock, remove);
+
+        container.appendChild(div);
+
+    });
+}
+
+
+// SUPPRIMER UN PRODUIT
+
+async function deleteProduct(id) {
+
+    if (!confirm("Voulez-vous supprimer ce produit ?")) return;
+
+    const { error } = await db
+        .from("products")
+        .delete()
+        .eq("id", id)
+        .eq("seller_id", currentUser.id);
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
+
+    loadProducts();
+}
+
+
+// DÉCONNEXION
+
+async function logout() {
+
+    await db.auth.signOut();
+
+    currentUser = null;
+
+    document.getElementById("dashboard").classList.add("hidden");
+    document.getElementById("authSection").classList.remove("hidden");
+
+}
+
+
+// RESTAURER LA SESSION
+
+async function checkSession() {
+
+    const { data } = await db.auth.getSession();
+
+    if (data.session) {
+        currentUser = data.session.user;
+        openDashboard();
+    }
+
+}
+
+checkSession();
+
+</script>
+
+</body>
+</html>
