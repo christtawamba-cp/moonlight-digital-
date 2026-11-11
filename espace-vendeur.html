@@ -8,9 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
@@ -70,17 +68,9 @@ button {
     font-weight: bold;
 }
 
-button:hover {
-    background: #252e50;
-}
+button:hover { background: #252e50; }
 
-.gold {
-    color: #f4bd45;
-}
-
-.logout {
-    background: #bd3434;
-}
+.logout { background: #bd3434; }
 
 .product {
     border: 1px solid #eee;
@@ -96,9 +86,7 @@ button:hover {
     border-radius: 8px;
 }
 
-.hidden {
-    display: none;
-}
+.hidden { display: none; }
 
 #message {
     padding: 10px;
@@ -133,13 +121,9 @@ footer {
 <h3>Créer un compte vendeur</h3>
 
 <input id="signupName" placeholder="Votre nom complet">
-
 <input id="signupShop" placeholder="Nom de votre boutique">
-
 <input id="signupWhatsapp" placeholder="Numéro WhatsApp">
-
 <input id="signupEmail" type="email" placeholder="Adresse email">
-
 <input id="signupPassword" type="password" placeholder="Mot de passe">
 
 <button onclick="signup()">Créer mon compte</button>
@@ -149,7 +133,6 @@ footer {
 <h3>Déjà vendeur ? Connectez-vous</h3>
 
 <input id="loginEmail" type="email" placeholder="Adresse email">
-
 <input id="loginPassword" type="password" placeholder="Mot de passe">
 
 <button onclick="login()">Se connecter</button>
@@ -170,7 +153,22 @@ footer {
 </div>
 
 
-<div class="card">
+<div id="profileSection" class="card hidden">
+
+<h2>Complétez votre profil vendeur</h2>
+
+<p>Ces informations permettront aux clients de vous contacter.</p>
+
+<input id="profileName" placeholder="Votre nom complet">
+<input id="profileShop" placeholder="Nom de votre boutique">
+<input id="profileWhatsapp" placeholder="Numéro WhatsApp">
+
+<button onclick="completeProfile()">Enregistrer mon profil</button>
+
+</div>
+
+
+<div id="productSection" class="card hidden">
 
 <h2>Publier un produit</h2>
 
@@ -203,7 +201,7 @@ footer {
 </div>
 
 
-<div class="card">
+<div id="myProductsSection" class="card hidden">
 
 <h2>Mes produits publiés</h2>
 
@@ -238,7 +236,7 @@ const db = window.supabase.createClient(
 let currentUser = null;
 
 
-// MESSAGE
+// MESSAGES
 
 function showMessage(message) {
     document.getElementById("message").innerText = message;
@@ -275,17 +273,54 @@ async function signup() {
         return;
     }
 
-    if (data.session) {
-        await saveProfile(name, shop, whatsapp, email);
+    // Conserver les informations en attendant la confirmation email
+
+    const pendingProfile = {
+        full_name: name,
+        shop_name: shop,
+        whatsapp: whatsapp
+    };
+
+    localStorage.setItem(
+        "moonlight_pending_profile",
+        JSON.stringify(pendingProfile)
+    );
+
+    if (data.session && data.user) {
+
+        currentUser = data.user;
+
+        await saveProfile(
+            name,
+            shop,
+            whatsapp
+        );
+
     } else {
-        showMessage("Compte créé ! Vérifiez votre email, puis connectez-vous pour terminer votre inscription.");
+
+        showMessage(
+            "Compte créé ! Vérifiez votre email, puis connectez-vous pour terminer votre inscription."
+        );
+
     }
 }
 
 
 // ENREGISTRER LE PROFIL
 
-async function saveProfile(name, shop, whatsapp, email) {
+async function saveProfile(name, shop, whatsapp) {
+
+    if (!currentUser) {
+        showMessage("Veuillez vous connecter pour enregistrer votre profil.");
+        return;
+    }
+
+    const email = currentUser.email;
+
+    if (!email) {
+        showMessage("Adresse email introuvable. Reconnectez-vous.");
+        return;
+    }
 
     const { error } = await db
         .from("seller_profiles")
@@ -295,6 +330,8 @@ async function saveProfile(name, shop, whatsapp, email) {
             shop_name: shop,
             whatsapp: whatsapp,
             email: email
+        }, {
+            onConflict: "id"
         });
 
     if (error) {
@@ -302,9 +339,11 @@ async function saveProfile(name, shop, whatsapp, email) {
         return;
     }
 
-    showMessage("Votre boutique est créée !");
+    localStorage.removeItem("moonlight_pending_profile");
 
-    openDashboard();
+    showMessage("Votre profil vendeur a été enregistré !");
+
+    await openDashboard();
 }
 
 
@@ -314,6 +353,11 @@ async function login() {
 
     const email = document.getElementById("loginEmail").value.trim();
     const password = document.getElementById("loginPassword").value;
+
+    if (!email || !password) {
+        showMessage("Veuillez saisir votre email et votre mot de passe.");
+        return;
+    }
 
     const { data, error } = await db.auth.signInWithPassword({
         email,
@@ -327,7 +371,33 @@ async function login() {
 
     currentUser = data.user;
 
-    openDashboard();
+    // Vérifier si un profil attend encore d'être enregistré
+
+    const pending = localStorage.getItem("moonlight_pending_profile");
+
+    if (pending) {
+
+        try {
+
+            const profile = JSON.parse(pending);
+
+            await saveProfile(
+                profile.full_name,
+                profile.shop_name,
+                profile.whatsapp
+            );
+
+            return;
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+
+    }
+
+    await openDashboard();
 }
 
 
@@ -335,26 +405,60 @@ async function login() {
 
 async function openDashboard() {
 
+    if (!currentUser) return;
+
     document.getElementById("authSection").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
 
-    const { data: profile } = await db
+    const { data: profile, error } = await db
         .from("seller_profiles")
         .select("*")
         .eq("id", currentUser.id)
         .maybeSingle();
 
-    if (!profile) {
+    if (error) {
         document.getElementById("sellerInfo").innerText =
-            "Finalisez votre profil vendeur.";
+            "Impossible de charger votre profil : " + error.message;
+        return;
+    }
+
+    if (!profile) {
+
+        document.getElementById("sellerInfo").innerText =
+            "Finalisez votre profil pour commencer à vendre.";
+
+        document.getElementById("profileSection").classList.remove("hidden");
+        document.getElementById("productSection").classList.add("hidden");
+        document.getElementById("myProductsSection").classList.add("hidden");
 
         return;
     }
+
+    document.getElementById("profileSection").classList.add("hidden");
+    document.getElementById("productSection").classList.remove("hidden");
+    document.getElementById("myProductsSection").classList.remove("hidden");
 
     document.getElementById("sellerInfo").innerText =
         "Boutique : " + profile.shop_name;
 
     loadProducts();
+}
+
+
+// COMPLÉTER LE PROFIL
+
+async function completeProfile() {
+
+    const name = document.getElementById("profileName").value.trim();
+    const shop = document.getElementById("profileShop").value.trim();
+    const whatsapp = document.getElementById("profileWhatsapp").value.trim();
+
+    if (!name || !shop || !whatsapp) {
+        alert("Veuillez remplir tous les champs.");
+        return;
+    }
+
+    await saveProfile(name, shop, whatsapp);
 }
 
 
@@ -371,7 +475,10 @@ async function publishProduct() {
     const stock = Number(document.getElementById("productStock").value);
     const file = document.getElementById("productImage").files[0];
 
-    if (!name || !category || !file || !Number.isFinite(price) || price <= 0 || !Number.isInteger(stock) || stock < 1) {
+    if (!name || !category || !file ||
+        !Number.isFinite(price) || price <= 0 ||
+        !Number.isInteger(stock) || stock < 1) {
+
         alert("Veuillez remplir correctement tous les champs et choisir une photo.");
         return;
     }
@@ -419,7 +526,11 @@ async function publishProduct() {
         });
 
     if (error) {
-        await db.storage.from("products-images").remove([path]);
+
+        await db.storage
+            .from("products-images")
+            .remove([path]);
+
         alert("Erreur : " + error.message);
         return;
     }
@@ -457,7 +568,8 @@ async function loadProducts() {
     container.innerHTML = "";
 
     if (!data || data.length === 0) {
-        container.innerHTML = "<p>Vous n'avez pas encore publié de produit.</p>";
+        container.innerHTML =
+            "<p>Vous n'avez pas encore publié de produit.</p>";
         return;
     }
 
@@ -527,6 +639,8 @@ async function logout() {
     document.getElementById("dashboard").classList.add("hidden");
     document.getElementById("authSection").classList.remove("hidden");
 
+    showMessage("Vous êtes déconnecté.");
+
 }
 
 
@@ -534,11 +648,19 @@ async function logout() {
 
 async function checkSession() {
 
-    const { data } = await db.auth.getSession();
+    const { data, error } = await db.auth.getSession();
+
+    if (error) {
+        console.error(error);
+        return;
+    }
 
     if (data.session) {
+
         currentUser = data.session.user;
-        openDashboard();
+
+        await openDashboard();
+
     }
 
 }
