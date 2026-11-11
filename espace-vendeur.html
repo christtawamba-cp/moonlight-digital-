@@ -116,6 +116,32 @@ button:hover { background: #252e50; }
     margin-bottom: 15px;
 }
 
+.stats {
+    background: #f4f5f9;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.stats p {
+    margin: 10px 0;
+}
+
+.commission {
+    color: #bd3434;
+    font-weight: bold;
+}
+
+.sale-status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 5px;
+    background: #fff1d6;
+    color: #8a5a00;
+    font-size: 13px;
+    font-weight: bold;
+}
+
 footer {
     text-align: center;
     padding: 25px;
@@ -204,7 +230,6 @@ footer {
 <img id="logoPreview" class="logo-preview hidden" alt="Logo de la boutique">
 <p class="help">Formats JPG, PNG ou WEBP. Maximum 5 MB.</p>
 
-
 <hr>
 
 <h2>🌐 Réseaux sociaux de ma boutique</h2>
@@ -262,6 +287,48 @@ footer {
 <div id="myProductsSection" class="card hidden">
 <h2>Mes produits publiés</h2>
 <div id="myProducts"></div>
+</div>
+
+
+<!-- MES VENTES ET COMMISSIONS -->
+
+<div id="salesSection" class="card hidden">
+
+<h2>💰 Mes ventes et commissions</h2>
+
+<p>Déclarez ici les ventes réalisées grâce à Moonlight Digital.</p>
+
+<div class="stats">
+    <p>Total de mes ventes : <strong id="totalSales">0 $</strong></p>
+    <p>Commissions à payer : 
+        <strong id="totalCommission" class="commission">0 $</strong>
+    </p>
+    <p>Commissions déjà payées :
+        <strong id="paidCommission">0 $</strong>
+    </p>
+</div>
+
+<h3>Déclarer une vente</h3>
+
+<label>Nom du produit vendu</label>
+<input id="saleProductName" placeholder="Exemple : Téléphone Samsung">
+
+<label>Quantité vendue</label>
+<input id="saleQuantity" type="number" min="1" value="1">
+
+<label>Montant total encaissé ($)</label>
+<input id="saleAmount" type="number" min="0.01" step="0.01" placeholder="Exemple : 100">
+
+<button id="reportSaleButton" onclick="reportSale()">Déclarer ma vente</button>
+
+<hr style="margin:25px 0;">
+
+<h3>Historique de mes ventes</h3>
+
+<div id="salesHistory">
+    Chargement...
+</div>
+
 </div>
 
 </div>
@@ -473,6 +540,7 @@ async function openDashboard() {
         document.getElementById("shopSettings").classList.add("hidden");
         document.getElementById("productSection").classList.add("hidden");
         document.getElementById("myProductsSection").classList.add("hidden");
+        document.getElementById("salesSection").classList.add("hidden");
 
         return;
     }
@@ -481,11 +549,10 @@ async function openDashboard() {
     document.getElementById("shopSettings").classList.remove("hidden");
     document.getElementById("productSection").classList.remove("hidden");
     document.getElementById("myProductsSection").classList.remove("hidden");
+    document.getElementById("salesSection").classList.remove("hidden");
 
     document.getElementById("sellerInfo").innerText =
         "Boutique : " + profile.shop_name;
-
-    // Charger les informations de la boutique
 
     document.getElementById("editShopName").value = profile.shop_name || "";
     document.getElementById("shopDescription").value = profile.shop_description || "";
@@ -509,6 +576,7 @@ async function openDashboard() {
     }
 
     loadProducts();
+    loadSales();
 }
 
 
@@ -762,6 +830,168 @@ async function loadProducts() {
         container.appendChild(div);
 
     });
+}
+
+
+// DÉCLARER UNE VENTE
+
+async function reportSale() {
+
+    if (!currentUser) return;
+
+    const button = document.getElementById("reportSaleButton");
+
+    const productName = document.getElementById("saleProductName").value.trim();
+    const quantity = Number(document.getElementById("saleQuantity").value);
+    const amount = Number(document.getElementById("saleAmount").value);
+
+    if (!productName ||
+        !Number.isInteger(quantity) || quantity < 1 ||
+        !Number.isFinite(amount) || amount <= 0) {
+
+        alert("Veuillez remplir correctement toutes les informations.");
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Enregistrement...";
+
+    try {
+
+        const { error } = await db
+            .from("seller_sales")
+            .insert({
+                seller_id: currentUser.id,
+                product_name: productName,
+                quantity: quantity,
+                sale_amount: amount
+            });
+
+        if (error) {
+            alert("Erreur : " + error.message);
+            return;
+        }
+
+        alert("Vente déclarée avec succès ! 🎉");
+
+        document.getElementById("saleProductName").value = "";
+        document.getElementById("saleQuantity").value = "1";
+        document.getElementById("saleAmount").value = "";
+
+        await loadSales();
+
+    } catch (error) {
+        alert("Une erreur est survenue : " + error.message);
+
+    } finally {
+        button.disabled = false;
+        button.textContent = "Déclarer ma vente";
+    }
+}
+
+
+// CHARGER LES VENTES DU VENDEUR
+
+async function loadSales() {
+
+    if (!currentUser) return;
+
+    const history = document.getElementById("salesHistory");
+
+    const { data, error } = await db
+        .from("seller_sales")
+        .select("*")
+        .eq("seller_id", currentUser.id)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        history.textContent = "Erreur de chargement : " + error.message;
+        return;
+    }
+
+    history.innerHTML = "";
+
+    let total = 0;
+    let unpaid = 0;
+    let paid = 0;
+
+    if (!data || data.length === 0) {
+
+        history.innerHTML = "<p>Aucune vente déclarée pour le moment.</p>";
+
+    } else {
+
+        data.forEach(sale => {
+
+            const saleAmount = Number(sale.sale_amount);
+            const commission = Number(sale.commission);
+
+            total += saleAmount;
+
+            if (sale.payment_status === "paid") {
+                paid += commission;
+            } else {
+                unpaid += commission;
+            }
+
+            const card = document.createElement("div");
+            card.className = "product";
+
+            const title = document.createElement("h3");
+            title.textContent = sale.product_name;
+
+            const quantity = document.createElement("p");
+            quantity.textContent = "Quantité vendue : " + sale.quantity;
+
+            const amount = document.createElement("p");
+            amount.textContent = "Montant de la vente : " +
+                saleAmount.toFixed(2) + " $";
+
+            const commissionText = document.createElement("p");
+            commissionText.textContent = "Commission Moonlight Digital : " +
+                commission.toFixed(2) + " $";
+
+            commissionText.className = "commission";
+
+            const status = document.createElement("span");
+
+            if (sale.payment_status === "paid") {
+                status.textContent = "Commission payée";
+                status.className = "sale-status";
+                status.style.background = "#d9f5e2";
+                status.style.color = "#16733a";
+            } else {
+                status.textContent = "Commission à payer";
+                status.className = "sale-status";
+            }
+
+            const date = document.createElement("p");
+            date.style.color = "#777";
+            date.style.fontSize = "13px";
+            date.textContent = "Date : " +
+                new Date(sale.created_at).toLocaleDateString("fr-FR");
+
+            card.append(
+                title,
+                quantity,
+                amount,
+                commissionText,
+                status,
+                date
+            );
+
+            history.appendChild(card);
+        });
+    }
+
+    document.getElementById("totalSales").textContent =
+        total.toFixed(2) + " $";
+
+    document.getElementById("totalCommission").textContent =
+        unpaid.toFixed(2) + " $";
+
+    document.getElementById("paidCommission").textContent =
+        paid.toFixed(2) + " $";
 }
 
 
