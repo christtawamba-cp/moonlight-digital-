@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#050505">
-
   <meta name="description" content="Découvrez les produits proposés par les vendeurs sur Moonlight Digital Marketplace.">
 
   <title>Marketplace | Moonlight Digital</title>
@@ -96,8 +95,7 @@
       margin-bottom: 30px;
     }
 
-    input,
-    select {
+    input, select {
       width: 100%;
       padding: 14px;
       background: #111;
@@ -107,8 +105,7 @@
       outline: none;
     }
 
-    input:focus,
-    select:focus {
+    input:focus, select:focus {
       border-color: #d4af37;
     }
 
@@ -175,6 +172,54 @@
     .stock {
       color: #999;
       font-size: 13px;
+      margin-bottom: 15px;
+    }
+
+    .seller-info {
+      border-top: 1px solid #333;
+      padding-top: 13px;
+      margin-top: 12px;
+      margin-bottom: 13px;
+    }
+
+    .seller-label {
+      color: #888;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .shop-name {
+      color: #d4af37;
+      font-size: 15px;
+      font-weight: bold;
+      overflow-wrap: anywhere;
+    }
+
+    .whatsapp-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: #25D366;
+      color: #fff;
+      text-decoration: none;
+      text-align: center;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .whatsapp-btn:hover {
+      background: #1da851;
+    }
+
+    .no-contact {
+      color: #888;
+      font-size: 12px;
+      text-align: center;
+      padding: 10px;
+      border: 1px solid #333;
+      border-radius: 8px;
     }
 
     .message {
@@ -270,9 +315,10 @@
   const categoryFilter = document.getElementById("categoryFilter");
 
   let allProducts = [];
+  let sellerProfiles = {};
 
   function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, function (character) {
+    return String(value ?? "").replace(/[&<>"']/g, function(character) {
       return {
         "&": "&amp;",
         "<": "&lt;",
@@ -293,6 +339,26 @@
     return amount.toLocaleString("fr-FR") + " $";
   }
 
+  function whatsappLink(phone, productName) {
+    if (!phone) return null;
+
+    let number = String(phone).replace(/\D/g, "");
+
+    // Conversion des numéros congolais commençant par 0.
+    if (number.startsWith("0")) {
+      number = "243" + number.substring(1);
+    }
+
+    if (!number || number.length < 8) {
+      return null;
+    }
+
+    const message = "Bonjour, je suis intéressé(e) par votre produit : " + productName;
+
+    return "https://wa.me/" + number +
+      "?text=" + encodeURIComponent(message);
+  }
+
   function renderProducts(products) {
     productsContainer.innerHTML = "";
 
@@ -302,15 +368,19 @@
       return;
     }
 
-    products.forEach(function (product) {
+    products.forEach(function(product) {
+
+      const seller = sellerProfiles[product.seller_id] || {};
+
       const card = document.createElement("article");
       card.className = "product";
 
       const image = document.createElement("img");
+
       image.src = product.image_url || "";
       image.alt = product.name || "Produit";
 
-      image.onerror = function () {
+      image.onerror = function() {
         image.style.display = "none";
       };
 
@@ -338,11 +408,48 @@
       stock.textContent =
         "Stock disponible : " + (product.stock ?? 0);
 
+      const sellerInfo = document.createElement("div");
+      sellerInfo.className = "seller-info";
+
+      const sellerLabel = document.createElement("p");
+      sellerLabel.className = "seller-label";
+      sellerLabel.textContent = "Vendu par :";
+
+      const shopName = document.createElement("p");
+      shopName.className = "shop-name";
+      shopName.textContent = seller.shop_name || "Boutique partenaire";
+
+      sellerInfo.appendChild(sellerLabel);
+      sellerInfo.appendChild(shopName);
+
       info.appendChild(name);
       info.appendChild(category);
       info.appendChild(description);
       info.appendChild(price);
       info.appendChild(stock);
+      info.appendChild(sellerInfo);
+
+      const link = whatsappLink(seller.whatsapp, product.name);
+
+      if (link) {
+        const contact = document.createElement("a");
+
+        contact.className = "whatsapp-btn";
+        contact.href = link;
+        contact.target = "_blank";
+        contact.rel = "noopener noreferrer";
+        contact.textContent = "Contacter sur WhatsApp";
+
+        info.appendChild(contact);
+
+      } else {
+        const noContact = document.createElement("p");
+
+        noContact.className = "no-contact";
+        noContact.textContent = "Contact vendeur indisponible";
+
+        info.appendChild(noContact);
+      }
 
       card.appendChild(image);
       card.appendChild(info);
@@ -355,7 +462,8 @@
     const search = searchInput.value.trim().toLowerCase();
     const category = categoryFilter.value;
 
-    const filtered = allProducts.filter(function (product) {
+    const filtered = allProducts.filter(function(product) {
+
       const matchesSearch =
         (product.name || "").toLowerCase().includes(search) ||
         (product.description || "").toLowerCase().includes(search);
@@ -370,32 +478,54 @@
   }
 
   async function loadProducts() {
+
     productsContainer.innerHTML =
       '<div class="message">Chargement des produits...</div>';
 
     try {
+
+      // Récupération des produits actifs.
       const { data, error } = await db
         .from("products")
-        .select("id, name, description, price, category, image_url, stock, created_at")
+        .select("id, seller_id, name, description, price, category, image_url, stock, created_at")
         .eq("status", "active")
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Erreur Supabase :", error);
-
-        productsContainer.innerHTML = `
-          <div class="message error">
-            Erreur : ${escapeHTML(error.message)}
-            <br><br>
-            Code : ${escapeHTML(error.code || "Inconnu")}
-          </div>
-        `;
-
-        return;
+        throw new Error("Produits : " + error.message);
       }
 
       allProducts = data || [];
 
+      // Récupération des identifiants des vendeurs.
+      const sellerIds = [
+        ...new Set(
+          allProducts
+            .map(product => product.seller_id)
+            .filter(Boolean)
+        )
+      ];
+
+      sellerProfiles = {};
+
+      // Récupération des boutiques et contacts publics.
+      if (sellerIds.length > 0) {
+
+        const { data: sellers, error: sellerError } = await db
+          .from("public_seller_profiles")
+          .select("id, shop_name, whatsapp")
+          .in("id", sellerIds);
+
+        if (sellerError) {
+          throw new Error("Boutiques : " + sellerError.message);
+        }
+
+        (sellers || []).forEach(function(seller) {
+          sellerProfiles[seller.id] = seller;
+        });
+      }
+
+      // Création des catégories.
       categoryFilter.innerHTML =
         '<option value="">Toutes les catégories</option>';
 
@@ -407,23 +537,27 @@
         )
       ].sort();
 
-      categories.forEach(function (category) {
+      categories.forEach(function(category) {
+
         const option = document.createElement("option");
+
         option.value = category;
         option.textContent = category;
+
         categoryFilter.appendChild(option);
       });
 
       renderProducts(allProducts);
 
     } catch (error) {
-      console.error("Erreur inattendue :", error);
+
+      console.error("Erreur :", error);
 
       productsContainer.innerHTML = `
         <div class="message error">
-          Impossible de contacter le serveur.
+          Une erreur est survenue.
           <br><br>
-          Détail : ${escapeHTML(error.message)}
+          ${escapeHTML(error.message)}
         </div>
       `;
     }
