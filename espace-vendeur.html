@@ -4,34 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Espace vendeur | Moonlight Digital</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 * { box-sizing: border-box; }
-
 body {
     margin: 0;
     font-family: Arial, sans-serif;
     background: #f4f5f9;
     color: #222;
 }
-
 header {
     background: #10152b;
     color: white;
     padding: 22px;
     text-align: center;
 }
-
 header h1 { margin: 0; color: #f4bd45; }
-
 .container {
     max-width: 750px;
     margin: 25px auto;
     padding: 15px;
 }
-
 .card {
     background: white;
     padding: 22px;
@@ -39,9 +32,7 @@ header h1 { margin: 0; color: #f4bd45; }
     margin-bottom: 20px;
     box-shadow: 0 3px 12px #0000000d;
 }
-
 h2 { color: #10152b; font-size: 20px; }
-
 input, textarea, select {
     width: 100%;
     padding: 13px;
@@ -50,18 +41,15 @@ input, textarea, select {
     border-radius: 7px;
     font-size: 15px;
 }
-
 textarea {
     min-height: 90px;
     resize: vertical;
 }
-
 label {
     display: block;
     font-weight: bold;
     margin-top: 8px;
 }
-
 button {
     background: #10152b;
     color: white;
@@ -72,34 +60,28 @@ button {
     width: 100%;
     font-weight: bold;
 }
-
 button:hover { background: #252e50; }
-
+button:disabled { opacity: 0.6; cursor: not-allowed; }
 .logout { background: #bd3434; }
-
 .product {
     border: 1px solid #eee;
     padding: 12px;
     border-radius: 10px;
     margin-top: 15px;
 }
-
 .product img {
     width: 100%;
     max-height: 230px;
     object-fit: cover;
     border-radius: 8px;
 }
-
 .hidden { display: none; }
-
 #message {
     padding: 10px;
     border-radius: 7px;
     margin-bottom: 15px;
     font-size: 14px;
 }
-
 .logo-preview {
     width: 110px;
     height: 110px;
@@ -108,30 +90,23 @@ button:hover { background: #252e50; }
     border: 2px solid #f4bd45;
     margin: 10px 0;
 }
-
 .help {
     font-size: 13px;
     color: #777;
     margin-top: -8px;
     margin-bottom: 15px;
 }
-
 .stats {
     background: #f4f5f9;
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
 }
-
-.stats p {
-    margin: 10px 0;
-}
-
+.stats p { margin: 10px 0; }
 .commission {
     color: #bd3434;
     font-weight: bold;
 }
-
 .sale-status {
     display: inline-block;
     padding: 6px 10px;
@@ -141,7 +116,11 @@ button:hover { background: #252e50; }
     font-size: 13px;
     font-weight: bold;
 }
-
+.edit-button {
+    background: #16733a;
+    margin-bottom: 8px;
+}
+.delete-button { background: #bd3434; }
 footer {
     text-align: center;
     padding: 25px;
@@ -149,118 +128,74 @@ footer {
 }
 </style>
 </head>
-
 <body>
-
 <header>
     <h1>🌙 MOONLIGHT DIGITAL</h1>
     <p>Espace vendeur – Marketplace</p>
 </header>
-
 <div class="container">
-
 <div id="authSection" class="card">
-
 <h2>Bienvenue sur Moonlight Digital</h2>
 <div id="message"></div>
-
 <h3>Créer un compte vendeur</h3>
-
 <input id="signupName" placeholder="Votre nom complet">
 <input id="signupShop" placeholder="Nom de votre boutique">
 <input id="signupWhatsapp" placeholder="Numéro WhatsApp">
 <input id="signupEmail" type="email" placeholder="Adresse email">
 <input id="signupPassword" type="password" placeholder="Mot de passe">
-
 <button onclick="signup()">Créer mon compte</button>
-
 <hr style="margin:25px 0;">
-
 <h3>Déjà vendeur ? Connectez-vous</h3>
-
 <input id="loginEmail" type="email" placeholder="Adresse email">
 <input id="loginPassword" type="password" placeholder="Mot de passe">
-
 <button onclick="login()">Se connecter</button>
-
 </div>
-
-
 <div id="dashboard" class="hidden">
-
 <div class="card">
 <h2>Bienvenue dans votre boutique ! 🛍️</h2>
 <p id="sellerInfo"></p>
 <button class="logout" onclick="logout()">Déconnexion</button>
 </div>
-
-
 <div id="profileSection" class="card hidden">
 <h2>Complétez votre profil vendeur</h2>
 <p>Ces informations permettront aux clients de vous contacter.</p>
-
 <input id="profileName" placeholder="Votre nom complet">
 <input id="profileShop" placeholder="Nom de votre boutique">
 <input id="profileWhatsapp" placeholder="Numéro WhatsApp">
-
 <button onclick="completeProfile()">Enregistrer mon profil</button>
 </div>
-
-
 <div id="shopSettings" class="card hidden">
-
 <h2>🏪 Informations de ma boutique</h2>
-
 <p>Personnalisez votre boutique pour donner confiance aux clients.</p>
-
 <label>Nom de la boutique</label>
 <input id="editShopName" placeholder="Nom de votre boutique">
-
 <label>Description de la boutique</label>
 <textarea id="shopDescription" placeholder="Présentez votre boutique et vos produits..."></textarea>
-
 <label>Adresse physique (facultatif)</label>
 <input id="physicalAddress" placeholder="Exemple : Kinshasa, Gombe">
-
 <label>Numéro WhatsApp</label>
 <input id="shopWhatsapp" placeholder="+243...">
-
 <label>Logo de la boutique</label>
 <input id="shopLogo" type="file" accept="image/jpeg,image/png,image/webp">
 <img id="logoPreview" class="logo-preview hidden" alt="Logo de la boutique">
 <p class="help">Formats JPG, PNG ou WEBP. Maximum 5 MB.</p>
-
 <hr>
-
 <h2>🌐 Réseaux sociaux de ma boutique</h2>
-
 <label>Facebook</label>
 <input id="facebookUrl" type="url" placeholder="https://facebook.com/votrepage">
-
 <label>Instagram</label>
 <input id="instagramUrl" type="url" placeholder="https://instagram.com/votrepage">
-
 <label>TikTok</label>
 <input id="tiktokUrl" type="url" placeholder="https://tiktok.com/@votrecompte">
-
 <label>YouTube</label>
 <input id="youtubeUrl" type="url" placeholder="https://youtube.com/@votrechaine">
-
 <button onclick="saveShopSettings()">Enregistrer les informations de ma boutique</button>
-
 </div>
-
-
 <div id="productSection" class="card hidden">
-
 <h2>Publier un produit</h2>
-
 <input id="productName" placeholder="Nom du produit">
-
 <textarea id="productDescription" placeholder="Description du produit"></textarea>
-
 <input id="productPrice" type="number" min="0.01" step="0.01" placeholder="Prix en dollars ($)">
-
 <select id="productCategory">
 <option value="">Choisir une catégorie</option>
 <option>Vêtements</option>
@@ -273,155 +208,137 @@ footer {
 <option>Alimentation</option>
 <option>Autres</option>
 </select>
-
 <input id="productStock" type="number" min="1" value="1" placeholder="Quantité disponible">
-
 <label>Photo du produit</label>
 <input id="productImage" type="file" accept="image/jpeg,image/png,image/webp">
-
 <button onclick="publishProduct()">Publier mon produit</button>
-
 </div>
-
-
+<!-- FORMULAIRE DE MODIFICATION -->
+<div id="editProductSection" class="card hidden">
+<h2>✏️ Modifier mon produit</h2>
+<input type="hidden" id="editProductId">
+<label>Nom du produit</label>
+<input id="editProductName" placeholder="Nom du produit">
+<label>Description</label>
+<textarea id="editProductDescription" placeholder="Description du produit"></textarea>
+<label>Prix en dollars ($)</label>
+<input id="editProductPrice" type="number" min="0.01" step="0.01">
+<label>Catégorie</label>
+<select id="editProductCategory">
+<option value="">Choisir une catégorie</option>
+<option>Vêtements</option>
+<option>Chaussures</option>
+<option>Téléphones et accessoires</option>
+<option>Informatique</option>
+<option>Électronique</option>
+<option>Beauté</option>
+<option>Maison</option>
+<option>Alimentation</option>
+<option>Autres</option>
+</select>
+<label>Quantité disponible</label>
+<input id="editProductStock" type="number" min="0">
+<label>Nouvelle photo (facultatif)</label>
+<input id="editProductImage" type="file" accept="image/jpeg,image/png,image/webp">
+<p class="help">Laissez la photo vide pour conserver l'ancienne.</p>
+<button id="updateProductButton" onclick="updateProduct()">Enregistrer les modifications</button>
+<button onclick="cancelEditProduct()" style="background:#777;margin-top:10px;">
+Annuler
+</button>
+</div>
 <div id="myProductsSection" class="card hidden">
 <h2>Mes produits publiés</h2>
 <div id="myProducts"></div>
 </div>
-
-
 <!-- MES VENTES ET COMMISSIONS -->
-
 <div id="salesSection" class="card hidden">
-
 <h2>💰 Mes ventes et commissions</h2>
-
 <p>Déclarez ici les ventes réalisées grâce à Moonlight Digital.</p>
-
 <div class="stats">
     <p>Total de mes ventes : <strong id="totalSales">0 $</strong></p>
-    <p>Commissions à payer : 
+    <p>Commissions à payer :
         <strong id="totalCommission" class="commission">0 $</strong>
     </p>
     <p>Commissions déjà payées :
         <strong id="paidCommission">0 $</strong>
     </p>
 </div>
-
 <h3>Déclarer une vente</h3>
-
 <label>Nom du produit vendu</label>
 <input id="saleProductName" placeholder="Exemple : Téléphone Samsung">
-
 <label>Quantité vendue</label>
 <input id="saleQuantity" type="number" min="1" value="1">
-
 <label>Montant total encaissé ($)</label>
 <input id="saleAmount" type="number" min="0.01" step="0.01" placeholder="Exemple : 100">
-
 <button id="reportSaleButton" onclick="reportSale()">Déclarer ma vente</button>
-
 <hr style="margin:25px 0;">
-
 <h3>Historique de mes ventes</h3>
-
-<div id="salesHistory">
-    Chargement...
-</div>
-
-</div>
-
+<div id="salesHistory">Chargement...</div>
 </div>
 </div>
-
+</div>
 <footer>
 © 2026 Moonlight Digital – Tous droits réservés.
 <br>
 Votre commerce, notre plateforme.
 </footer>
-
-
 <script>
-
 const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
 const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
-
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 let currentUser = null;
 let currentLogoUrl = "";
-
-
 function showMessage(message) {
     document.getElementById("message").innerText = message;
 }
-
-
 function validSocialUrl(value, platform) {
     if (!value) return true;
-
     try {
         const url = new URL(value);
-
         if (url.protocol !== "https:" && url.protocol !== "http:") {
             return false;
         }
-
         const host = url.hostname.toLowerCase();
-
         const domains = {
             facebook: ["facebook.com", "www.facebook.com", "m.facebook.com"],
             instagram: ["instagram.com", "www.instagram.com"],
             tiktok: ["tiktok.com", "www.tiktok.com", "vm.tiktok.com"],
             youtube: ["youtube.com", "www.youtube.com", "youtu.be"]
         };
-
         return domains[platform].includes(host);
-
     } catch {
         return false;
     }
 }
-
-
 // INSCRIPTION
-
 async function signup() {
-
     const name = document.getElementById("signupName").value.trim();
     const shop = document.getElementById("signupShop").value.trim();
     const whatsapp = document.getElementById("signupWhatsapp").value.trim();
     const email = document.getElementById("signupEmail").value.trim();
     const password = document.getElementById("signupPassword").value;
-
     if (!name || !shop || !whatsapp || !email || !password) {
         showMessage("Veuillez remplir tous les champs.");
         return;
     }
-
     if (password.length < 6) {
         showMessage("Le mot de passe doit contenir au moins 6 caractères.");
         return;
     }
-
     const { data, error } = await db.auth.signUp({ email, password });
-
     if (error) {
         showMessage(error.message);
         return;
     }
-
     const pendingProfile = {
         full_name: name,
         shop_name: shop,
         whatsapp: whatsapp
     };
-
     localStorage.setItem(
         "moonlight_pending_profile",
         JSON.stringify(pendingProfile)
     );
-
     if (data.session && data.user) {
         currentUser = data.user;
         await saveProfile(name, shop, whatsapp);
@@ -429,17 +346,12 @@ async function signup() {
         showMessage("Compte créé ! Vérifiez votre email, puis connectez-vous pour terminer votre inscription.");
     }
 }
-
-
 // ENREGISTRER LE PROFIL
-
 async function saveProfile(name, shop, whatsapp) {
-
     if (!currentUser || !currentUser.email) {
         showMessage("Veuillez vous connecter pour enregistrer votre profil.");
         return false;
     }
-
     const { error } = await db
         .from("seller_profiles")
         .upsert({
@@ -449,47 +361,33 @@ async function saveProfile(name, shop, whatsapp) {
             whatsapp: whatsapp,
             email: currentUser.email
         }, { onConflict: "id" });
-
     if (error) {
         showMessage("Erreur profil : " + error.message);
         return false;
     }
-
     localStorage.removeItem("moonlight_pending_profile");
-
     showMessage("Votre profil vendeur a été enregistré !");
-
     await openDashboard();
     return true;
 }
-
-
 // CONNEXION
-
 async function login() {
-
     const email = document.getElementById("loginEmail").value.trim();
     const password = document.getElementById("loginPassword").value;
-
     if (!email || !password) {
         showMessage("Veuillez saisir votre email et votre mot de passe.");
         return;
     }
-
     const { data, error } = await db.auth.signInWithPassword({
         email,
         password
     });
-
     if (error) {
         showMessage(error.message);
         return;
     }
-
     currentUser = data.user;
-
     const pending = localStorage.getItem("moonlight_pending_profile");
-
     if (pending) {
         try {
             const profile = JSON.parse(pending);
@@ -498,171 +396,124 @@ async function login() {
                 profile.shop_name,
                 profile.whatsapp
             );
-
             if (saved) return;
-
         } catch (error) {
             console.error(error);
         }
     }
-
     await openDashboard();
 }
-
-
 // TABLEAU DE BORD
-
 async function openDashboard() {
-
     if (!currentUser) return;
-
     document.getElementById("authSection").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
-
     const { data: profile, error } = await db
         .from("seller_profiles")
         .select("*")
         .eq("id", currentUser.id)
         .maybeSingle();
-
     if (error) {
         document.getElementById("sellerInfo").innerText =
             "Impossible de charger votre profil : " + error.message;
         return;
     }
-
     if (!profile) {
-
         document.getElementById("sellerInfo").innerText =
             "Finalisez votre profil pour commencer à vendre.";
-
         document.getElementById("profileSection").classList.remove("hidden");
         document.getElementById("shopSettings").classList.add("hidden");
         document.getElementById("productSection").classList.add("hidden");
+        document.getElementById("editProductSection").classList.add("hidden");
         document.getElementById("myProductsSection").classList.add("hidden");
         document.getElementById("salesSection").classList.add("hidden");
-
         return;
     }
-
     document.getElementById("profileSection").classList.add("hidden");
     document.getElementById("shopSettings").classList.remove("hidden");
     document.getElementById("productSection").classList.remove("hidden");
     document.getElementById("myProductsSection").classList.remove("hidden");
     document.getElementById("salesSection").classList.remove("hidden");
-
     document.getElementById("sellerInfo").innerText =
         "Boutique : " + profile.shop_name;
-
     document.getElementById("editShopName").value = profile.shop_name || "";
     document.getElementById("shopDescription").value = profile.shop_description || "";
     document.getElementById("physicalAddress").value = profile.physical_address || "";
     document.getElementById("shopWhatsapp").value = profile.whatsapp || "";
-
     document.getElementById("facebookUrl").value = profile.facebook_url || "";
     document.getElementById("instagramUrl").value = profile.instagram_url || "";
     document.getElementById("tiktokUrl").value = profile.tiktok_url || "";
     document.getElementById("youtubeUrl").value = profile.youtube_url || "";
-
     currentLogoUrl = profile.shop_logo_url || "";
-
     const preview = document.getElementById("logoPreview");
-
     if (currentLogoUrl) {
         preview.src = currentLogoUrl;
         preview.classList.remove("hidden");
     } else {
         preview.classList.add("hidden");
     }
-
-    loadProducts();
-    loadSales();
+    await loadProducts();
+    await loadSales();
 }
-
-
 // COMPLÉTER LE PROFIL
-
 async function completeProfile() {
-
     const name = document.getElementById("profileName").value.trim();
     const shop = document.getElementById("profileShop").value.trim();
     const whatsapp = document.getElementById("profileWhatsapp").value.trim();
-
     if (!name || !shop || !whatsapp) {
         alert("Veuillez remplir tous les champs.");
         return;
     }
-
     await saveProfile(name, shop, whatsapp);
 }
-
-
 // ENREGISTRER LES INFORMATIONS DE LA BOUTIQUE
-
 async function saveShopSettings() {
-
     if (!currentUser) return;
-
     const shop = document.getElementById("editShopName").value.trim();
     const description = document.getElementById("shopDescription").value.trim();
     const address = document.getElementById("physicalAddress").value.trim();
     const whatsapp = document.getElementById("shopWhatsapp").value.trim();
-
     const facebook = document.getElementById("facebookUrl").value.trim();
     const instagram = document.getElementById("instagramUrl").value.trim();
     const tiktok = document.getElementById("tiktokUrl").value.trim();
     const youtube = document.getElementById("youtubeUrl").value.trim();
-
     if (!shop || !whatsapp) {
         alert("Le nom de la boutique et le numéro WhatsApp sont obligatoires.");
         return;
     }
-
     if (!validSocialUrl(facebook, "facebook") ||
         !validSocialUrl(instagram, "instagram") ||
         !validSocialUrl(tiktok, "tiktok") ||
         !validSocialUrl(youtube, "youtube")) {
-
         alert("Vérifiez les liens de vos réseaux sociaux. Utilisez les adresses officielles des plateformes.");
         return;
     }
-
     let logoUrl = currentLogoUrl;
     const file = document.getElementById("shopLogo").files[0];
-
     if (file) {
-
         const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-
         if (!allowedTypes.includes(file.type)) {
             alert("Format du logo accepté : JPG, PNG ou WEBP.");
             return;
         }
-
         if (file.size > 5 * 1024 * 1024) {
             alert("Le logo ne doit pas dépasser 5 MB.");
             return;
         }
-
         const extension = file.name.split(".").pop().toLowerCase();
         const path = currentUser.id + "/logo-" + crypto.randomUUID() + "." + extension;
-
         const { error: uploadError } = await db.storage
             .from("products-images")
             .upload(path, file);
-
         if (uploadError) {
             alert("Erreur lors de l'envoi du logo : " + uploadError.message);
             return;
         }
-
         const { data: imageData } = db.storage
             .from("products-images")
             .getPublicUrl(path);
-
         logoUrl = imageData.publicUrl;
     }
-
     const { error } = await db
         .from("seller_profiles")
         .update({
@@ -677,71 +528,51 @@ async function saveShopSettings() {
             youtube_url: youtube
         })
         .eq("id", currentUser.id);
-
     if (error) {
         alert("Erreur lors de l'enregistrement : " + error.message);
         return;
     }
-
     currentLogoUrl = logoUrl;
-
     document.getElementById("shopLogo").value = "";
-
     alert("Les informations de votre boutique ont été enregistrées ! 🎉");
-
     await openDashboard();
 }
-
-
 // PUBLICATION PRODUIT
-
 async function publishProduct() {
-
     if (!currentUser) return;
-
     const name = document.getElementById("productName").value.trim();
     const description = document.getElementById("productDescription").value.trim();
     const price = Number(document.getElementById("productPrice").value);
     const category = document.getElementById("productCategory").value;
     const stock = Number(document.getElementById("productStock").value);
     const file = document.getElementById("productImage").files[0];
-
     if (!name || !category || !file ||
         !Number.isFinite(price) || price <= 0 ||
         !Number.isInteger(stock) || stock < 1) {
-
         alert("Veuillez remplir correctement tous les champs et choisir une photo.");
         return;
     }
-
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-
     if (!allowedTypes.includes(file.type)) {
         alert("Format accepté : JPG, PNG ou WEBP.");
         return;
     }
-
     if (file.size > 5 * 1024 * 1024) {
         alert("La photo ne doit pas dépasser 5 MB.");
         return;
     }
-
     const extension = file.name.split(".").pop().toLowerCase();
     const path = currentUser.id + "/" + crypto.randomUUID() + "." + extension;
-
     const { error: uploadError } = await db.storage
         .from("products-images")
         .upload(path, file);
-
     if (uploadError) {
         alert("Erreur photo : " + uploadError.message);
         return;
     }
-
     const { data: imageData } = db.storage
         .from("products-images")
         .getPublicUrl(path);
-
     const { error } = await db
         .from("products")
         .insert({
@@ -754,110 +585,185 @@ async function publishProduct() {
             stock,
             status: "active"
         });
-
     if (error) {
-
         await db.storage.from("products-images").remove([path]);
-
         alert("Erreur : " + error.message);
         return;
     }
-
     alert("Produit publié avec succès ! 🎉");
-
     document.getElementById("productName").value = "";
     document.getElementById("productDescription").value = "";
     document.getElementById("productPrice").value = "";
     document.getElementById("productCategory").value = "";
     document.getElementById("productStock").value = "1";
     document.getElementById("productImage").value = "";
-
-    loadProducts();
+    await loadProducts();
 }
-
-
+// OUVRIR LE FORMULAIRE DE MODIFICATION
+function editProduct(product) {
+    document.getElementById("editProductId").value = product.id;
+    document.getElementById("editProductName").value = product.name || "";
+    document.getElementById("editProductDescription").value = product.description || "";
+    document.getElementById("editProductPrice").value = product.price;
+    document.getElementById("editProductCategory").value = product.category || "";
+    document.getElementById("editProductStock").value = product.stock;
+    document.getElementById("editProductImage").value = "";
+    document.getElementById("editProductSection").classList.remove("hidden");
+    document.getElementById("editProductSection").scrollIntoView({
+        behavior: "smooth"
+    });
+}
+// ANNULER LA MODIFICATION
+function cancelEditProduct() {
+    document.getElementById("editProductSection").classList.add("hidden");
+    document.getElementById("editProductId").value = "";
+    document.getElementById("editProductImage").value = "";
+}
+// ENREGISTRER LES MODIFICATIONS
+async function updateProduct() {
+    if (!currentUser) return;
+    const button = document.getElementById("updateProductButton");
+    const id = document.getElementById("editProductId").value;
+    const name = document.getElementById("editProductName").value.trim();
+    const description = document.getElementById("editProductDescription").value.trim();
+    const price = Number(document.getElementById("editProductPrice").value);
+    const category = document.getElementById("editProductCategory").value;
+    const stock = Number(document.getElementById("editProductStock").value);
+    const file = document.getElementById("editProductImage").files[0];
+    if (!id || !name || !category ||
+        !Number.isFinite(price) || price <= 0 ||
+        !Number.isInteger(stock) || stock < 0) {
+        alert("Veuillez vérifier les informations du produit.");
+        return;
+    }
+    button.disabled = true;
+    button.textContent = "Enregistrement...";
+    let uploadedPath = null;
+    try {
+        const changes = {
+            name,
+            description,
+            price,
+            category,
+            stock
+        };
+        if (file) {
+            const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+            if (!allowedTypes.includes(file.type)) {
+                alert("Format accepté : JPG, PNG ou WEBP.");
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert("La photo ne doit pas dépasser 5 MB.");
+                return;
+            }
+            const extension = file.name.split(".").pop().toLowerCase();
+            uploadedPath = currentUser.id + "/" + crypto.randomUUID() + "." + extension;
+            const { error: uploadError } = await db.storage
+                .from("products-images")
+                .upload(uploadedPath, file);
+            if (uploadError) {
+                alert("Erreur photo : " + uploadError.message);
+                return;
+            }
+            const { data: imageData } = db.storage
+                .from("products-images")
+                .getPublicUrl(uploadedPath);
+            changes.image_url = imageData.publicUrl;
+        }
+        const { data, error } = await db
+            .from("products")
+            .update(changes)
+            .eq("id", id)
+            .eq("seller_id", currentUser.id)
+            .select("id");
+        if (error) {
+            if (uploadedPath) {
+                await db.storage.from("products-images").remove([uploadedPath]);
+            }
+            alert("Erreur : " + error.message);
+            return;
+        }
+        if (!data || data.length === 0) {
+            if (uploadedPath) {
+                await db.storage.from("products-images").remove([uploadedPath]);
+            }
+            alert("Aucun produit modifié. Vérifiez que vous êtes bien propriétaire de ce produit.");
+            return;
+        }
+        alert("Produit modifié avec succès ! 🎉");
+        cancelEditProduct();
+        await loadProducts();
+    } catch (error) {
+        if (uploadedPath) {
+            await db.storage.from("products-images").remove([uploadedPath]);
+        }
+        alert("Une erreur est survenue : " + error.message);
+    } finally {
+        button.disabled = false;
+        button.textContent = "Enregistrer les modifications";
+    }
+}
 // AFFICHER LES PRODUITS
-
 async function loadProducts() {
-
+    if (!currentUser) return;
     const { data, error } = await db
         .from("products")
         .select("*")
         .eq("seller_id", currentUser.id)
         .order("created_at", { ascending: false });
-
     const container = document.getElementById("myProducts");
-
     if (error) {
         container.innerText = error.message;
         return;
     }
-
     container.innerHTML = "";
-
     if (!data || data.length === 0) {
         container.innerHTML = "<p>Vous n'avez pas encore publié de produit.</p>";
         return;
     }
-
     data.forEach(product => {
-
         const div = document.createElement("div");
         div.className = "product";
-
         const img = document.createElement("img");
         img.src = product.image_url;
         img.alt = product.name;
-
         const title = document.createElement("h3");
         title.textContent = product.name;
-
         const price = document.createElement("p");
         price.textContent = product.price + " $";
-
         const category = document.createElement("p");
         category.textContent = "Catégorie : " + product.category;
-
         const stock = document.createElement("p");
         stock.textContent = "Stock : " + product.stock;
-
+        const edit = document.createElement("button");
+        edit.textContent = "✏️ Modifier";
+        edit.className = "edit-button";
+        edit.onclick = () => editProduct(product);
         const remove = document.createElement("button");
         remove.textContent = "Supprimer";
-        remove.style.background = "#bd3434";
+        remove.className = "delete-button";
         remove.onclick = () => deleteProduct(product.id);
-
-        div.append(img, title, price, category, stock, remove);
+        div.append(img, title, price, category, stock, edit, remove);
         container.appendChild(div);
-
     });
 }
-
-
 // DÉCLARER UNE VENTE
-
 async function reportSale() {
-
     if (!currentUser) return;
-
     const button = document.getElementById("reportSaleButton");
-
     const productName = document.getElementById("saleProductName").value.trim();
     const quantity = Number(document.getElementById("saleQuantity").value);
     const amount = Number(document.getElementById("saleAmount").value);
-
     if (!productName ||
         !Number.isInteger(quantity) || quantity < 1 ||
         !Number.isFinite(amount) || amount <= 0) {
-
         alert("Veuillez remplir correctement toutes les informations.");
         return;
     }
-
     button.disabled = true;
     button.textContent = "Enregistrement...";
-
     try {
-
         const { error } = await db
             .from("seller_sales")
             .insert({
@@ -866,95 +772,65 @@ async function reportSale() {
                 quantity: quantity,
                 sale_amount: amount
             });
-
         if (error) {
             alert("Erreur : " + error.message);
             return;
         }
-
         alert("Vente déclarée avec succès ! 🎉");
-
         document.getElementById("saleProductName").value = "";
         document.getElementById("saleQuantity").value = "1";
         document.getElementById("saleAmount").value = "";
-
         await loadSales();
-
     } catch (error) {
         alert("Une erreur est survenue : " + error.message);
-
     } finally {
         button.disabled = false;
         button.textContent = "Déclarer ma vente";
     }
 }
-
-
 // CHARGER LES VENTES DU VENDEUR
-
 async function loadSales() {
-
     if (!currentUser) return;
-
     const history = document.getElementById("salesHistory");
-
     const { data, error } = await db
         .from("seller_sales")
         .select("*")
         .eq("seller_id", currentUser.id)
         .order("created_at", { ascending: false });
-
     if (error) {
         history.textContent = "Erreur de chargement : " + error.message;
         return;
     }
-
     history.innerHTML = "";
-
     let total = 0;
     let unpaid = 0;
     let paid = 0;
-
     if (!data || data.length === 0) {
-
         history.innerHTML = "<p>Aucune vente déclarée pour le moment.</p>";
-
     } else {
-
         data.forEach(sale => {
-
             const saleAmount = Number(sale.sale_amount);
             const commission = Number(sale.commission);
-
             total += saleAmount;
-
             if (sale.payment_status === "paid") {
                 paid += commission;
             } else {
                 unpaid += commission;
             }
-
             const card = document.createElement("div");
             card.className = "product";
-
             const title = document.createElement("h3");
             title.textContent = sale.product_name;
-
             const quantity = document.createElement("p");
             quantity.textContent = "Quantité vendue : " + sale.quantity;
-
             const amount = document.createElement("p");
             amount.textContent = "Montant de la vente : " +
                 saleAmount.toFixed(2) + " $";
-
             const commissionText = document.createElement("p");
             commissionText.textContent = "Commission Moonlight Digital : " +
                 commission.toFixed(2) + " $";
-
             commissionText.className = "commission";
-
             const status = document.createElement("span");
-
             if (sale.payment_status === "paid") {
                 status.textContent = "Commission payée";
                 status.className = "sale-status";
@@ -964,13 +840,11 @@ async function loadSales() {
                 status.textContent = "Commission à payer";
                 status.className = "sale-status";
             }
-
             const date = document.createElement("p");
             date.style.color = "#777";
             date.style.fontSize = "13px";
             date.textContent = "Date : " +
                 new Date(sale.created_at).toLocaleDateString("fr-FR");
-
             card.append(
                 title,
                 quantity,
@@ -979,78 +853,53 @@ async function loadSales() {
                 status,
                 date
             );
-
             history.appendChild(card);
         });
     }
-
     document.getElementById("totalSales").textContent =
         total.toFixed(2) + " $";
-
     document.getElementById("totalCommission").textContent =
         unpaid.toFixed(2) + " $";
-
     document.getElementById("paidCommission").textContent =
         paid.toFixed(2) + " $";
 }
-
-
 // SUPPRIMER UN PRODUIT
-
 async function deleteProduct(id) {
-
     if (!confirm("Voulez-vous supprimer ce produit ?")) return;
-
     const { error } = await db
         .from("products")
         .delete()
         .eq("id", id)
         .eq("seller_id", currentUser.id);
-
     if (error) {
         alert(error.message);
         return;
     }
-
-    loadProducts();
+    alert("Produit supprimé avec succès.");
+    await loadProducts();
 }
-
-
 // DÉCONNEXION
-
 async function logout() {
-
     await db.auth.signOut();
-
     currentUser = null;
-
     document.getElementById("dashboard").classList.add("hidden");
     document.getElementById("authSection").classList.remove("hidden");
-
+    document.getElementById("editProductSection").classList.add("hidden");
     showMessage("Vous êtes déconnecté.");
 }
-
-
 // RESTAURER LA SESSION
-
 async function checkSession() {
-
     const { data, error } = await db.auth.getSession();
-
     if (error) {
         console.error(error);
         return;
     }
-
     if (data.session) {
         currentUser = data.session.user;
         await openDashboard();
     }
 }
-
 checkSession();
-
 </script>
-
 </body>
 </html>
