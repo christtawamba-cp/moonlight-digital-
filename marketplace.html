@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050505">
+
+  <meta name="description" content="Découvrez les produits proposés par les vendeurs sur Moonlight Digital Marketplace.">
+
+  <title>Marketplace | Moonlight Digital</title>
+
+  <link rel="canonical" href="https://christtawamba-cp.github.io/moonlight-digital/marketplace.html">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #050505;
+      color: white;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 15px;
+      background: #080808;
+      border-bottom: 1px solid #292929;
+    }
+
+    header h1 {
+      color: #d4af37;
+      font-size: 28px;
+    }
+
+    header p {
+      color: #aaa;
+      margin-top: 8px;
+    }
+
+    .top-buttons {
+      margin-top: 20px;
+    }
+
+    .top-buttons a {
+      display: inline-block;
+      margin: 5px;
+      padding: 11px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .home-btn {
+      color: white;
+      border: 1px solid #d4af37;
+    }
+
+    .seller-btn {
+      background: #d4af37;
+      color: #050505;
+    }
+
+    .container {
+      max-width: 1150px;
+      margin: auto;
+      padding: 35px 18px;
+    }
+
+    .intro {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .intro h2 {
+      color: #d4af37;
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .intro p {
+      color: #aaa;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 14px;
+      background: #111;
+      color: white;
+      border: 1px solid #333;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #d4af37;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 22px;
+    }
+
+    .product {
+      background: #111;
+      border: 1px solid #292929;
+      border-radius: 15px;
+      overflow: hidden;
+      transition: 0.3s;
+    }
+
+    .product:hover {
+      transform: translateY(-4px);
+      border-color: #d4af37;
+    }
+
+    .product img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      background: #191919;
+    }
+
+    .product-info {
+      padding: 18px;
+    }
+
+    .product-info h3 {
+      color: #d4af37;
+      margin-bottom: 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .category {
+      display: inline-block;
+      color: #d4af37;
+      background: #252014;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      margin-bottom: 10px;
+    }
+
+    .description {
+      color: #aaa;
+      font-size: 14px;
+      margin-bottom: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .price {
+      font-size: 21px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 8px;
+    }
+
+    .stock {
+      color: #999;
+      font-size: 13px;
+    }
+
+    .message {
+      text-align: center;
+      color: #aaa;
+      padding: 35px 10px;
+      grid-column: 1 / -1;
+    }
+
+    .error {
+      color: #ff7777;
+    }
+
+    footer {
+      border-top: 1px solid #292929;
+      padding: 25px;
+      text-align: center;
+      color: #777;
+      font-size: 13px;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 23px;
+      }
+
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
+      .product img {
+        height: 200px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🌙 MOONLIGHT DIGITAL</h1>
+  <p>MARKETPLACE — Achetez et découvrez des produits.</p>
+
+  <div class="top-buttons">
+    <a href="index.html" class="home-btn">← Accueil</a>
+    <a href="espace-vendeur.html" class="seller-btn">+ Vendre un produit</a>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="intro">
+    <h2>Notre Marketplace</h2>
+    <p>Découvrez les produits disponibles auprès de nos vendeurs.</p>
+  </section>
+
+  <section class="filters">
+    <input
+      type="search"
+      id="searchInput"
+      placeholder="🔍 Rechercher un produit..."
+    >
+
+    <select id="categoryFilter">
+      <option value="">Toutes les catégories</option>
+    </select>
+  </section>
+
+  <section class="products" id="products">
+    <div class="message">Chargement des produits...</div>
+  </section>
+
+</main>
+
+<footer>
+  © 2026 Moonlight Digital — Tous droits réservés.
+</footer>
+
+<script>
+  const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
+
+  const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
+
+  const db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  const productsContainer = document.getElementById("products");
+  const searchInput = document.getElementById("searchInput");
+  const categoryFilter = document.getElementById("categoryFilter");
+
+  let allProducts = [];
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, function (character) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[character];
+    });
+  }
+
+  function displayPrice(price) {
+    const amount = Number(price);
+
+    if (!Number.isFinite(amount)) {
+      return "Prix à confirmer";
+    }
+
+    return amount.toLocaleString("fr-FR") + " $";
+  }
+
+  function renderProducts(products) {
+    productsContainer.innerHTML = "";
+
+    if (!products.length) {
+      productsContainer.innerHTML =
+        '<div class="message">Aucun produit trouvé.</div>';
+      return;
+    }
+
+    products.forEach(function (product) {
+      const card = document.createElement("article");
+      card.className = "product";
+
+      const image = document.createElement("img");
+      image.src = product.image_url || "";
+      image.alt = product.name || "Produit";
+
+      image.onerror = function () {
+        image.style.display = "none";
+      };
+
+      const info = document.createElement("div");
+      info.className = "product-info";
+
+      const name = document.createElement("h3");
+      name.textContent = product.name || "Produit sans nom";
+
+      const category = document.createElement("span");
+      category.className = "category";
+      category.textContent = product.category || "Autre";
+
+      const description = document.createElement("p");
+      description.className = "description";
+      description.textContent = product.description || "Aucune description disponible.";
+
+      const price = document.createElement("p");
+      price.className = "price";
+      price.textContent = displayPrice(product.price);
+
+      const stock = document.createElement("p");
+      stock.className = "stock";
+      stock.textContent = "Stock disponible : " + (product.stock ?? 0);
+
+      info.appendChild(name);
+      info.appendChild(category);
+      info.appendChild(description);
+      info.appendChild(price);
+      info.appendChild(stock);
+
+      card.appendChild(image);
+      card.appendChild(info);
+
+      productsContainer.appendChild(card);
+    });
+  }
+
+  function applyFilters() {
+    const search = searchInput.value.trim().toLowerCase();
+    const category = categoryFilter.value;
+
+    const filtered = allProducts.filter(function (product) {
+      const matchesSearch =
+        (product.name || "").toLowerCase().includes(search) ||
+        (product.description || "").toLowerCase().includes(search);
+
+      const matchesCategory =
+        !category || product.category === category;
+
+      return matchesSearch && matchesCategory;
+    });
+
+    renderProducts(filtered);
+  }
+
+  async function loadProducts() {
+    productsContainer.innerHTML =
+      '<div class="message">Chargement des produits...</div>';
+
+    const { data, error } = await db
+      .from("products")
+      .select("id, name, description, price, category, image_url, stock, created_at")
+      .eq("status", "active")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Erreur Supabase :", error);
+
+      productsContainer.innerHTML =
+        '<div class="message error">Impossible de charger les produits. Réessayez plus tard.</div>';
+
+      return;
+    }
+
+    allProducts = data || [];
+
+    const categories = [
+      ...new Set(
+        allProducts
+          .map(product => product.category)
+          .filter(Boolean)
+      )
+    ].sort();
+
+    categories.forEach(function (category) {
+      const option = document.createElement("option");
+      option.value = category;
+      option.textContent = category;
+      categoryFilter.appendChild(option);
+    });
+
+    renderProducts(allProducts);
+  }
+
+  searchInput.addEventListener("input", applyFilters);
+  categoryFilter.addEventListener("change", applyFilters);
+
+  loadProducts();
+</script>
+
+</body>
+</html>
