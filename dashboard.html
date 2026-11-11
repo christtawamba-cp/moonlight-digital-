@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Moonlight Digital | Tableau de bord</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
 body{background:#080808;color:white}
@@ -38,49 +36,47 @@ input[type=file]{font-size:14px}
 .release:last-child{border-bottom:0}
 .status{color:#e9c45c;font-size:13px}
 #message{text-align:center;padding:20px;color:#ffcc66}
+.whatsapp-button{
+display:block;
+margin-top:15px;
+padding:14px;
+background:#25D366;
+color:#fff;
+text-decoration:none;
+border-radius:8px;
+font-weight:bold;
+text-align:center;
+}
 footer{text-align:center;padding:30px;color:#777;font-size:13px;margin-top:30px}
 @media(max-width:480px){header{flex-wrap:wrap}.logo{font-size:16px}.container{padding:18px 12px}}
 </style>
 </head>
-
 <body>
-
 <header>
 <div class="logo">🌙 MOONLIGHT DIGITAL</div>
 <button class="logout" id="logoutBtn">Déconnexion</button>
 </header>
-
 <div class="container">
-
 <div id="message">Chargement de votre espace artiste...</div>
-
 <div id="dashboard" style="display:none">
-
 <section class="welcome">
 <h1>Bienvenue, <span id="artistName">Artiste</span> !</h1>
 <p>Gérez votre carrière musicale depuis votre espace personnel Moonlight Digital.</p>
 </section>
-
 <h2 class="section-title">👤 Mon profil</h2>
-
 <section class="profile">
 <p><strong>Nom d'artiste :</strong> <span id="artist">-</span></p>
 <p><strong>Nom complet :</strong> <span id="fullname">-</span></p>
 <p><strong>Téléphone :</strong> <span id="phone">-</span></p>
 <p><strong>Pays :</strong> <span id="country">-</span></p>
 </section>
-
 <h2 class="section-title">🎵 Déposer une musique</h2>
-
 <section class="panel">
-
 <form id="releaseForm">
-
 <div>
 <label for="title">Titre du projet *</label>
 <input id="title" type="text" required maxlength="150" placeholder="Ex : CHARBONNER">
 </div>
-
 <div>
 <label for="releaseType">Type de sortie *</label>
 <select id="releaseType" required>
@@ -89,119 +85,111 @@ footer{text-align:center;padding:30px;color:#777;font-size:13px;margin-top:30px}
 <option value="album">Album</option>
 </select>
 </div>
-
 <div>
 <label for="releaseDate">Date de sortie souhaitée *</label>
 <input id="releaseDate" type="date" required>
 </div>
-
 <div>
 <label for="audio">Fichier audio (MP3, WAV, FLAC ou MP4 audio) *</label>
 <input id="audio" type="file" accept=".mp3,.wav,.flac,.m4a,.mp4,audio/*" required>
 <p style="color:#999;font-size:12px;margin-top:6px">Taille maximale : 100 Mo.</p>
 </div>
-
 <div>
 <label for="cover">Pochette du projet (JPG, PNG ou WEBP) *</label>
 <input id="cover" type="file" accept="image/jpeg,image/png,image/webp" required>
 <p style="color:#999;font-size:12px;margin-top:6px">Taille maximale : 10 Mo.</p>
 </div>
-
 <button class="primary" id="submitBtn" type="submit">
 Envoyer mon projet
 </button>
-
 </form>
-
 <div id="formMessage" class="notice" role="status" aria-live="polite"></div>
-
 </section>
-
 <h2 class="section-title">💿 Mes sorties musicales</h2>
-
 <section class="panel">
 <div id="releasesList">Chargement des sorties...</div>
 </section>
-
 <h2 class="section-title">📊 Autres services</h2>
-
 <section class="cards">
-
 <div class="card">
 <h3>📈 Statistiques</h3>
 <p>Suivi des performances de vos morceaux.</p>
 <span class="badge">Bientôt disponible</span>
 </div>
-
 <div class="card">
 <h3>💰 Revenus</h3>
 <p>Consultation de vos revenus musicaux.</p>
 <span class="badge">Bientôt disponible</span>
 </div>
-
 <div class="card">
 <h3>🏦 Paiements</h3>
 <p>Suivi de vos paiements et transactions.</p>
 <span class="badge">Bientôt disponible</span>
 </div>
-
 </section>
-
 </div>
 </div>
-
 <footer>© 2026 Moonlight Digital — Distribution musicale</footer>
-
 <script>
 const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
 const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
-
 const client = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-
 let currentUser = null;
 let currentArtist = "Artiste";
-
 const message = document.getElementById("message");
 const formMessage = document.getElementById("formMessage");
 const submitBtn = document.getElementById("submitBtn");
-
 function showFormMessage(text,type){
     formMessage.textContent = text;
     formMessage.className = "notice " + type;
     formMessage.style.display = "block";
 }
-
+/* NOTIFICATION WHATSAPP */
+function showWhatsAppNotification(artist,title,type,date){
+    const phone = "243XXXXXXXXX";
+    const text =
+`🌙 NOUVELLE DEMANDE DE DISTRIBUTION
+Artiste : ${artist}
+Projet : ${title}
+Type : ${type}
+Date de sortie souhaitée : ${date}
+Une nouvelle demande vient d'être enregistrée sur Moonlight Digital.
+Connectez-vous à votre espace administrateur pour examiner le projet.`;
+    const url = "https://wa.me/" + phone + "?text=" + encodeURIComponent(text);
+    formMessage.textContent = "Projet enregistré avec succès !";
+    const link = document.createElement("a");
+    link.href = url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.className = "whatsapp-button";
+    link.textContent = "📲 M'envoyer les détails sur WhatsApp";
+    formMessage.appendChild(link);
+    formMessage.className = "notice success";
+    formMessage.style.display = "block";
+}
 async function loadDashboard(){
     try{
         const {data:{session},error:sessionError} =
             await client.auth.getSession();
-
         if(sessionError) throw sessionError;
-
         if(!session){
             window.location.href = "espace-artiste.html";
             return;
         }
-
         currentUser = session.user;
-
         const {data:profile,error} = await client
             .from("profiles")
             .select("full_name,artist_name,phone,country,role")
             .eq("id",currentUser.id)
             .maybeSingle();
-
         if(error) throw error;
-
         const metadata = currentUser.user_metadata || {};
-
         currentArtist =
             profile?.artist_name ||
             metadata.artist_name ||
             profile?.full_name ||
             metadata.full_name ||
             "Artiste";
-
         document.getElementById("artistName").textContent = currentArtist;
         document.getElementById("artist").textContent = currentArtist;
         document.getElementById("fullname").textContent =
@@ -210,89 +198,68 @@ async function loadDashboard(){
             profile?.phone || metadata.phone || "Non renseigné";
         document.getElementById("country").textContent =
             profile?.country || metadata.country || "RDC";
-
         message.style.display = "none";
         document.getElementById("dashboard").style.display = "block";
-
         await loadReleases();
-
     }catch(error){
         message.textContent = "Erreur : " + error.message;
     }
 }
-
 async function loadReleases(){
     const list = document.getElementById("releasesList");
-
     const {data,error} = await client
         .from("releases")
         .select("id,title,release_type,release_date,status,created_at")
         .eq("user_id",currentUser.id)
         .order("created_at",{ascending:false});
-
     if(error){
         list.textContent = "Impossible de charger vos sorties : " + error.message;
         return;
     }
-
     if(!data || data.length === 0){
         list.textContent = "Vous n'avez pas encore déposé de musique.";
         return;
     }
-
     list.replaceChildren();
-
     data.forEach(item=>{
         const div = document.createElement("div");
         div.className = "release";
-
         const title = document.createElement("strong");
         title.textContent = item.title;
-
         const details = document.createElement("div");
         details.textContent =
             "Type : " + item.release_type +
             " | Date : " + (item.release_date || "Non définie");
-
         const status = document.createElement("div");
         status.className = "status";
         status.textContent = "Statut : " + item.status;
-
         div.append(title,details,status);
         list.appendChild(div);
     });
 }
-
 document.getElementById("releaseForm").addEventListener("submit",async function(event){
-
     event.preventDefault();
-
     if(!currentUser){
         showFormMessage("Votre session a expiré. Reconnectez-vous.","error");
         return;
     }
-
     const title = document.getElementById("title").value.trim();
     const releaseType = document.getElementById("releaseType").value;
     const releaseDate = document.getElementById("releaseDate").value;
     const audio = document.getElementById("audio").files[0];
     const cover = document.getElementById("cover").files[0];
-
     if(!title || !releaseDate || !audio || !cover){
         showFormMessage("Veuillez remplir tous les champs.","error");
         return;
     }
-
     if(audio.size > 100 * 1024 * 1024){
         showFormMessage("Le fichier audio dépasse la limite de 100 Mo.","error");
         return;
     }
-
     if(cover.size > 10 * 1024 * 1024){
         showFormMessage("La pochette dépasse la limite de 10 Mo.","error");
         return;
     }
-
     const allowedAudio = [
         "audio/mpeg",
         "audio/wav",
@@ -301,47 +268,36 @@ document.getElementById("releaseForm").addEventListener("submit",async function(
         "audio/mp4",
         "audio/x-m4a"
     ];
-
     const audioExtension = audio.name.split(".").pop().toLowerCase();
-
     if(!["mp3","wav","flac","m4a","mp4"].includes(audioExtension)){
         showFormMessage("Format audio non autorisé.","error");
         return;
     }
-
     if(audio.type && !allowedAudio.includes(audio.type)){
         showFormMessage("Le format audio n'est pas accepté. Utilisez MP3, WAV, FLAC ou M4A.","error");
         return;
     }
-
     if(!["image/jpeg","image/png","image/webp"].includes(cover.type)){
         showFormMessage("La pochette doit être au format JPG, PNG ou WEBP.","error");
         return;
     }
-
     submitBtn.disabled = true;
     submitBtn.textContent = "Envoi en cours...";
     showFormMessage("Téléchargement des fichiers en cours. Veuillez patienter.","success");
-
     try{
         const id = crypto.randomUUID();
         const audioPath = currentUser.id + "/" + id + "." + audioExtension;
         const coverExtension = cover.type === "image/png" ? "png" :
             cover.type === "image/webp" ? "webp" : "jpg";
         const coverPath = currentUser.id + "/" + id + "." + coverExtension;
-
         const {error:audioError} = await client.storage
             .from("releases-audio")
             .upload(audioPath,audio,{upsert:false});
-
         if(audioError) throw audioError;
-
         const {error:coverError} = await client.storage
             .from("releases-covers")
             .upload(coverPath,cover,{upsert:false});
-
         if(coverError) throw coverError;
-
         const {error:insertError} = await client
             .from("releases")
             .insert({
@@ -354,15 +310,16 @@ document.getElementById("releaseForm").addEventListener("submit",async function(
                 cover_path:coverPath,
                 status:"pending"
             });
-
         if(insertError) throw insertError;
-
-        showFormMessage("Félicitations ! Votre projet a été envoyé à Moonlight Digital.","success");
-
+        /* AFFICHER LA NOTIFICATION WHATSAPP */
+        showWhatsAppNotification(
+            currentArtist,
+            title,
+            releaseType,
+            releaseDate
+        );
         document.getElementById("releaseForm").reset();
-
         await loadReleases();
-
     }catch(error){
         showFormMessage("Échec de l'envoi : " + error.message,"error");
     }finally{
@@ -370,20 +327,15 @@ document.getElementById("releaseForm").addEventListener("submit",async function(
         submitBtn.textContent = "Envoyer mon projet";
     }
 });
-
 document.getElementById("logoutBtn").addEventListener("click",async()=>{
     const {error} = await client.auth.signOut();
-
     if(error){
         alert("Erreur : " + error.message);
         return;
     }
-
     window.location.href = "espace-artiste.html";
 });
-
 loadDashboard();
 </script>
-
 </body>
 </html>
