@@ -24,10 +24,7 @@ header {
     text-align: center;
 }
 
-header h1 {
-    margin: 0;
-    color: #f4bd45;
-}
+header h1 { margin: 0; color: #f4bd45; }
 
 .container {
     max-width: 750px;
@@ -43,10 +40,7 @@ header h1 {
     box-shadow: 0 3px 12px #0000000d;
 }
 
-h2 {
-    color: #10152b;
-    font-size: 20px;
-}
+h2 { color: #10152b; font-size: 20px; }
 
 input, textarea, select {
     width: 100%;
@@ -55,6 +49,17 @@ input, textarea, select {
     border: 1px solid #ddd;
     border-radius: 7px;
     font-size: 15px;
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 8px;
 }
 
 button {
@@ -95,6 +100,22 @@ button:hover { background: #252e50; }
     font-size: 14px;
 }
 
+.logo-preview {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #f4bd45;
+    margin: 10px 0;
+}
+
+.help {
+    font-size: 13px;
+    color: #777;
+    margin-top: -8px;
+    margin-bottom: 15px;
+}
+
 footer {
     text-align: center;
     padding: 25px;
@@ -115,7 +136,6 @@ footer {
 <div id="authSection" class="card">
 
 <h2>Bienvenue sur Moonlight Digital</h2>
-
 <div id="message"></div>
 
 <h3>Créer un compte vendeur</h3>
@@ -143,20 +163,14 @@ footer {
 <div id="dashboard" class="hidden">
 
 <div class="card">
-
 <h2>Bienvenue dans votre boutique ! 🛍️</h2>
-
 <p id="sellerInfo"></p>
-
 <button class="logout" onclick="logout()">Déconnexion</button>
-
 </div>
 
 
 <div id="profileSection" class="card hidden">
-
 <h2>Complétez votre profil vendeur</h2>
-
 <p>Ces informations permettront aux clients de vous contacter.</p>
 
 <input id="profileName" placeholder="Votre nom complet">
@@ -164,6 +178,50 @@ footer {
 <input id="profileWhatsapp" placeholder="Numéro WhatsApp">
 
 <button onclick="completeProfile()">Enregistrer mon profil</button>
+</div>
+
+
+<div id="shopSettings" class="card hidden">
+
+<h2>🏪 Informations de ma boutique</h2>
+
+<p>Personnalisez votre boutique pour donner confiance aux clients.</p>
+
+<label>Nom de la boutique</label>
+<input id="editShopName" placeholder="Nom de votre boutique">
+
+<label>Description de la boutique</label>
+<textarea id="shopDescription" placeholder="Présentez votre boutique et vos produits..."></textarea>
+
+<label>Adresse physique (facultatif)</label>
+<input id="physicalAddress" placeholder="Exemple : Kinshasa, Gombe">
+
+<label>Numéro WhatsApp</label>
+<input id="shopWhatsapp" placeholder="+243...">
+
+<label>Logo de la boutique</label>
+<input id="shopLogo" type="file" accept="image/jpeg,image/png,image/webp">
+<img id="logoPreview" class="logo-preview hidden" alt="Logo de la boutique">
+<p class="help">Formats JPG, PNG ou WEBP. Maximum 5 MB.</p>
+
+
+<hr>
+
+<h2>🌐 Réseaux sociaux de ma boutique</h2>
+
+<label>Facebook</label>
+<input id="facebookUrl" type="url" placeholder="https://facebook.com/votrepage">
+
+<label>Instagram</label>
+<input id="instagramUrl" type="url" placeholder="https://instagram.com/votrepage">
+
+<label>TikTok</label>
+<input id="tiktokUrl" type="url" placeholder="https://tiktok.com/@votrecompte">
+
+<label>YouTube</label>
+<input id="youtubeUrl" type="url" placeholder="https://youtube.com/@votrechaine">
+
+<button onclick="saveShopSettings()">Enregistrer les informations de ma boutique</button>
 
 </div>
 
@@ -202,15 +260,11 @@ footer {
 
 
 <div id="myProductsSection" class="card hidden">
-
 <h2>Mes produits publiés</h2>
-
 <div id="myProducts"></div>
-
 </div>
 
 </div>
-
 </div>
 
 <footer>
@@ -222,24 +276,44 @@ Votre commerce, notre plateforme.
 
 <script>
 
-// CONFIGURATION SUPABASE
-
 const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
-
 const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
 
-const db = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
+let currentLogoUrl = "";
 
-
-// MESSAGES
 
 function showMessage(message) {
     document.getElementById("message").innerText = message;
+}
+
+
+function validSocialUrl(value, platform) {
+    if (!value) return true;
+
+    try {
+        const url = new URL(value);
+
+        if (url.protocol !== "https:" && url.protocol !== "http:") {
+            return false;
+        }
+
+        const host = url.hostname.toLowerCase();
+
+        const domains = {
+            facebook: ["facebook.com", "www.facebook.com", "m.facebook.com"],
+            instagram: ["instagram.com", "www.instagram.com"],
+            tiktok: ["tiktok.com", "www.tiktok.com", "vm.tiktok.com"],
+            youtube: ["youtube.com", "www.youtube.com", "youtu.be"]
+        };
+
+        return domains[platform].includes(host);
+
+    } catch {
+        return false;
+    }
 }
 
 
@@ -263,17 +337,12 @@ async function signup() {
         return;
     }
 
-    const { data, error } = await db.auth.signUp({
-        email,
-        password
-    });
+    const { data, error } = await db.auth.signUp({ email, password });
 
     if (error) {
         showMessage(error.message);
         return;
     }
-
-    // Conserver les informations en attendant la confirmation email
 
     const pendingProfile = {
         full_name: name,
@@ -287,21 +356,10 @@ async function signup() {
     );
 
     if (data.session && data.user) {
-
         currentUser = data.user;
-
-        await saveProfile(
-            name,
-            shop,
-            whatsapp
-        );
-
+        await saveProfile(name, shop, whatsapp);
     } else {
-
-        showMessage(
-            "Compte créé ! Vérifiez votre email, puis connectez-vous pour terminer votre inscription."
-        );
-
+        showMessage("Compte créé ! Vérifiez votre email, puis connectez-vous pour terminer votre inscription.");
     }
 }
 
@@ -310,16 +368,9 @@ async function signup() {
 
 async function saveProfile(name, shop, whatsapp) {
 
-    if (!currentUser) {
+    if (!currentUser || !currentUser.email) {
         showMessage("Veuillez vous connecter pour enregistrer votre profil.");
-        return;
-    }
-
-    const email = currentUser.email;
-
-    if (!email) {
-        showMessage("Adresse email introuvable. Reconnectez-vous.");
-        return;
+        return false;
     }
 
     const { error } = await db
@@ -329,14 +380,12 @@ async function saveProfile(name, shop, whatsapp) {
             full_name: name,
             shop_name: shop,
             whatsapp: whatsapp,
-            email: email
-        }, {
-            onConflict: "id"
-        });
+            email: currentUser.email
+        }, { onConflict: "id" });
 
     if (error) {
         showMessage("Erreur profil : " + error.message);
-        return;
+        return false;
     }
 
     localStorage.removeItem("moonlight_pending_profile");
@@ -344,6 +393,7 @@ async function saveProfile(name, shop, whatsapp) {
     showMessage("Votre profil vendeur a été enregistré !");
 
     await openDashboard();
+    return true;
 }
 
 
@@ -371,30 +421,22 @@ async function login() {
 
     currentUser = data.user;
 
-    // Vérifier si un profil attend encore d'être enregistré
-
     const pending = localStorage.getItem("moonlight_pending_profile");
 
     if (pending) {
-
         try {
-
             const profile = JSON.parse(pending);
-
-            await saveProfile(
+            const saved = await saveProfile(
                 profile.full_name,
                 profile.shop_name,
                 profile.whatsapp
             );
 
-            return;
+            if (saved) return;
 
         } catch (error) {
-
             console.error(error);
-
         }
-
     }
 
     await openDashboard();
@@ -428,6 +470,7 @@ async function openDashboard() {
             "Finalisez votre profil pour commencer à vendre.";
 
         document.getElementById("profileSection").classList.remove("hidden");
+        document.getElementById("shopSettings").classList.add("hidden");
         document.getElementById("productSection").classList.add("hidden");
         document.getElementById("myProductsSection").classList.add("hidden");
 
@@ -435,11 +478,35 @@ async function openDashboard() {
     }
 
     document.getElementById("profileSection").classList.add("hidden");
+    document.getElementById("shopSettings").classList.remove("hidden");
     document.getElementById("productSection").classList.remove("hidden");
     document.getElementById("myProductsSection").classList.remove("hidden");
 
     document.getElementById("sellerInfo").innerText =
         "Boutique : " + profile.shop_name;
+
+    // Charger les informations de la boutique
+
+    document.getElementById("editShopName").value = profile.shop_name || "";
+    document.getElementById("shopDescription").value = profile.shop_description || "";
+    document.getElementById("physicalAddress").value = profile.physical_address || "";
+    document.getElementById("shopWhatsapp").value = profile.whatsapp || "";
+
+    document.getElementById("facebookUrl").value = profile.facebook_url || "";
+    document.getElementById("instagramUrl").value = profile.instagram_url || "";
+    document.getElementById("tiktokUrl").value = profile.tiktok_url || "";
+    document.getElementById("youtubeUrl").value = profile.youtube_url || "";
+
+    currentLogoUrl = profile.shop_logo_url || "";
+
+    const preview = document.getElementById("logoPreview");
+
+    if (currentLogoUrl) {
+        preview.src = currentLogoUrl;
+        preview.classList.remove("hidden");
+    } else {
+        preview.classList.add("hidden");
+    }
 
     loadProducts();
 }
@@ -459,6 +526,102 @@ async function completeProfile() {
     }
 
     await saveProfile(name, shop, whatsapp);
+}
+
+
+// ENREGISTRER LES INFORMATIONS DE LA BOUTIQUE
+
+async function saveShopSettings() {
+
+    if (!currentUser) return;
+
+    const shop = document.getElementById("editShopName").value.trim();
+    const description = document.getElementById("shopDescription").value.trim();
+    const address = document.getElementById("physicalAddress").value.trim();
+    const whatsapp = document.getElementById("shopWhatsapp").value.trim();
+
+    const facebook = document.getElementById("facebookUrl").value.trim();
+    const instagram = document.getElementById("instagramUrl").value.trim();
+    const tiktok = document.getElementById("tiktokUrl").value.trim();
+    const youtube = document.getElementById("youtubeUrl").value.trim();
+
+    if (!shop || !whatsapp) {
+        alert("Le nom de la boutique et le numéro WhatsApp sont obligatoires.");
+        return;
+    }
+
+    if (!validSocialUrl(facebook, "facebook") ||
+        !validSocialUrl(instagram, "instagram") ||
+        !validSocialUrl(tiktok, "tiktok") ||
+        !validSocialUrl(youtube, "youtube")) {
+
+        alert("Vérifiez les liens de vos réseaux sociaux. Utilisez les adresses officielles des plateformes.");
+        return;
+    }
+
+    let logoUrl = currentLogoUrl;
+    const file = document.getElementById("shopLogo").files[0];
+
+    if (file) {
+
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+        if (!allowedTypes.includes(file.type)) {
+            alert("Format du logo accepté : JPG, PNG ou WEBP.");
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert("Le logo ne doit pas dépasser 5 MB.");
+            return;
+        }
+
+        const extension = file.name.split(".").pop().toLowerCase();
+        const path = currentUser.id + "/logo-" + crypto.randomUUID() + "." + extension;
+
+        const { error: uploadError } = await db.storage
+            .from("products-images")
+            .upload(path, file);
+
+        if (uploadError) {
+            alert("Erreur lors de l'envoi du logo : " + uploadError.message);
+            return;
+        }
+
+        const { data: imageData } = db.storage
+            .from("products-images")
+            .getPublicUrl(path);
+
+        logoUrl = imageData.publicUrl;
+    }
+
+    const { error } = await db
+        .from("seller_profiles")
+        .update({
+            shop_name: shop,
+            shop_description: description,
+            physical_address: address,
+            whatsapp: whatsapp,
+            shop_logo_url: logoUrl,
+            facebook_url: facebook,
+            instagram_url: instagram,
+            tiktok_url: tiktok,
+            youtube_url: youtube
+        })
+        .eq("id", currentUser.id);
+
+    if (error) {
+        alert("Erreur lors de l'enregistrement : " + error.message);
+        return;
+    }
+
+    currentLogoUrl = logoUrl;
+
+    document.getElementById("shopLogo").value = "";
+
+    alert("Les informations de votre boutique ont été enregistrées ! 🎉");
+
+    await openDashboard();
 }
 
 
@@ -496,7 +659,6 @@ async function publishProduct() {
     }
 
     const extension = file.name.split(".").pop().toLowerCase();
-
     const path = currentUser.id + "/" + crypto.randomUUID() + "." + extension;
 
     const { error: uploadError } = await db.storage
@@ -516,20 +678,18 @@ async function publishProduct() {
         .from("products")
         .insert({
             seller_id: currentUser.id,
-            name: name,
-            description: description,
-            price: price,
-            category: category,
+            name,
+            description,
+            price,
+            category,
             image_url: imageData.publicUrl,
-            stock: stock,
+            stock,
             status: "active"
         });
 
     if (error) {
 
-        await db.storage
-            .from("products-images")
-            .remove([path]);
+        await db.storage.from("products-images").remove([path]);
 
         alert("Erreur : " + error.message);
         return;
@@ -568,8 +728,7 @@ async function loadProducts() {
     container.innerHTML = "";
 
     if (!data || data.length === 0) {
-        container.innerHTML =
-            "<p>Vous n'avez pas encore publié de produit.</p>";
+        container.innerHTML = "<p>Vous n'avez pas encore publié de produit.</p>";
         return;
     }
 
@@ -600,7 +759,6 @@ async function loadProducts() {
         remove.onclick = () => deleteProduct(product.id);
 
         div.append(img, title, price, category, stock, remove);
-
         container.appendChild(div);
 
     });
@@ -640,7 +798,6 @@ async function logout() {
     document.getElementById("authSection").classList.remove("hidden");
 
     showMessage("Vous êtes déconnecté.");
-
 }
 
 
@@ -656,13 +813,9 @@ async function checkSession() {
     }
 
     if (data.session) {
-
         currentUser = data.session.user;
-
         await openDashboard();
-
     }
-
 }
 
 checkSession();
