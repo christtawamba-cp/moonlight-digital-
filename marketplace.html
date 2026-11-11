@@ -303,6 +303,31 @@ input:focus, select:focus {
   max-width: 450px;
 }
 
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px auto;
+}
+
+.social-link {
+  display: inline-block;
+  padding: 11px 16px;
+  border: 1px solid #d4af37;
+  border-radius: 25px;
+  color: #d4af37;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.social-link:hover {
+  background: #d4af37;
+  color: #050505;
+}
+
 .back-btn {
   background: transparent;
   color: #d4af37;
@@ -364,59 +389,51 @@ footer {
 
 <main class="container">
 
-  <!-- PAGE PRINCIPALE -->
+<section id="mainPage">
 
-  <section id="mainPage">
+  <div class="intro">
+    <h2>Notre Marketplace</h2>
+    <p>Découvrez les boutiques et les produits de nos vendeurs.</p>
+  </div>
 
-    <div class="intro">
-      <h2>Notre Marketplace</h2>
-      <p>Découvrez les boutiques et les produits de nos vendeurs.</p>
-    </div>
+  <h2 class="section-title">🏪 Nos boutiques</h2>
 
-    <h2 class="section-title">🏪 Nos boutiques</h2>
-
-    <section class="shops" id="shops">
-      <div class="message">Chargement des boutiques...</div>
-    </section>
-
-    <h2 class="section-title">🛍️ Tous les produits</h2>
-
-    <section class="filters">
-      <input
-        type="search"
-        id="searchInput"
-        placeholder="🔍 Rechercher un produit..."
-      >
-
-      <select id="categoryFilter">
-        <option value="">Toutes les catégories</option>
-      </select>
-    </section>
-
-    <section class="products" id="products">
-      <div class="message">Chargement des produits...</div>
-    </section>
-
+  <section class="shops" id="shops">
+    <div class="message">Chargement des boutiques...</div>
   </section>
 
+  <h2 class="section-title">🛍️ Tous les produits</h2>
 
-  <!-- PAGE INDIVIDUELLE DU VENDEUR -->
+  <section class="filters">
+    <input type="search" id="searchInput" placeholder="🔍 Rechercher un produit...">
 
-  <section id="shopPage" class="hidden">
-
-    <button class="nav-btn back-btn" onclick="showMainPage()">
-      ← Retour aux boutiques
-    </button>
-
-    <div id="shopDetails"></div>
-
-    <h2 class="section-title">Les produits de cette boutique</h2>
-
-    <section class="products" id="shopProducts">
-      <div class="message">Chargement...</div>
-    </section>
-
+    <select id="categoryFilter">
+      <option value="">Toutes les catégories</option>
+    </select>
   </section>
+
+  <section class="products" id="products">
+    <div class="message">Chargement des produits...</div>
+  </section>
+
+</section>
+
+
+<section id="shopPage" class="hidden">
+
+  <button class="nav-btn back-btn" onclick="showMainPage()">
+    ← Retour aux boutiques
+  </button>
+
+  <div id="shopDetails"></div>
+
+  <h2 class="section-title">Les produits de cette boutique</h2>
+
+  <section class="products" id="shopProducts">
+    <div class="message">Chargement...</div>
+  </section>
+
+</section>
 
 </main>
 
@@ -435,10 +452,7 @@ const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
 
 const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
 
-const db = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 
 // ÉLÉMENTS HTML
@@ -477,9 +491,7 @@ function escapeHTML(value) {
 function displayPrice(price) {
   const amount = Number(price);
 
-  if (!Number.isFinite(amount)) {
-    return "Prix à confirmer";
-  }
+  if (!Number.isFinite(amount)) return "Prix à confirmer";
 
   return amount.toLocaleString("fr-FR") + " $";
 }
@@ -495,9 +507,7 @@ function whatsappLink(phone, productName = "") {
     number = "243" + number.substring(1);
   }
 
-  if (!number || number.length < 8) {
-    return null;
-  }
+  if (!number || number.length < 8) return null;
 
   const message = productName
     ? "Bonjour, je suis intéressé(e) par votre produit : " + productName
@@ -521,6 +531,160 @@ function defaultLogo() {
 
 function getSeller(id) {
   return sellerProfiles[id] || {};
+}
+
+
+// VALIDATION DES LIENS SOCIAUX
+
+function safeSocialUrl(value, platform) {
+
+  if (!value) return null;
+
+  try {
+
+    const url = new URL(value);
+
+    if (url.protocol !== "https:" && url.protocol !== "http:") {
+      return null;
+    }
+
+    const domains = {
+      facebook: ["facebook.com", "www.facebook.com", "m.facebook.com"],
+      instagram: ["instagram.com", "www.instagram.com"],
+      tiktok: ["tiktok.com", "www.tiktok.com", "vm.tiktok.com"],
+      youtube: ["youtube.com", "www.youtube.com", "youtu.be"]
+    };
+
+    if (!domains[platform].includes(url.hostname.toLowerCase())) {
+      return null;
+    }
+
+    return url.href;
+
+  } catch {
+    return null;
+  }
+}
+
+
+// CRÉER LES BOUTONS DES RÉSEAUX SOCIAUX
+
+function createSocialLinks(seller) {
+
+  const container = document.createElement("div");
+  container.className = "social-links";
+
+  const networks = [
+    {
+      name: "Facebook",
+      icon: "📘",
+      url: seller.facebook_url,
+      platform: "facebook"
+    },
+    {
+      name: "Instagram",
+      icon: "📸",
+      url: seller.instagram_url,
+      platform: "instagram"
+    },
+    {
+      name: "TikTok",
+      icon: "🎵",
+      url: seller.tiktok_url,
+      platform: "tiktok"
+    },
+    {
+      name: "YouTube",
+      icon: "▶️",
+      url: seller.youtube_url,
+      platform: "youtube"
+    }
+  ];
+
+  let count = 0;
+
+  networks.forEach(function(network) {
+
+    const url = safeSocialUrl(network.url, network.platform);
+
+    if (!url) return;
+
+    const link = document.createElement("a");
+
+    link.className = "social-link";
+    link.href = url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = network.icon + " " + network.name;
+
+    container.appendChild(link);
+    count++;
+
+  });
+
+  if (count === 0) {
+    const message = document.createElement("p");
+    message.textContent = "Cette boutique n'a pas encore ajouté ses réseaux sociaux.";
+    message.style.color = "#888";
+    container.appendChild(message);
+  }
+
+  return container;
+}
+
+
+// RÉCUPÉRER UNE BOUTIQUE
+
+function getShopProfileElement(seller) {
+
+  const profile = document.createElement("div");
+  profile.className = "shop-profile";
+
+  const logo = document.createElement("img");
+  logo.className = "shop-logo";
+  logo.src = seller.shop_logo_url || defaultLogo();
+  logo.alt = "Logo de " + (seller.shop_name || "la boutique");
+
+  logo.onerror = function() {
+    logo.src = defaultLogo();
+  };
+
+  const title = document.createElement("h2");
+  title.textContent = seller.shop_name || "Boutique partenaire";
+
+  const description = document.createElement("p");
+  description.textContent =
+    seller.shop_description || "Aucune présentation disponible.";
+
+  profile.append(logo, title, description);
+
+  if (seller.physical_address) {
+
+    const address = document.createElement("p");
+    address.textContent = "📍 Adresse : " + seller.physical_address;
+
+    profile.appendChild(address);
+  }
+
+  const contactLink = whatsappLink(seller.whatsapp);
+
+  if (contactLink) {
+
+    const contact = document.createElement("a");
+    contact.className = "whatsapp-btn profile-contact";
+    contact.href = contactLink;
+    contact.target = "_blank";
+    contact.rel = "noopener noreferrer";
+    contact.textContent = "Contacter cette boutique sur WhatsApp";
+
+    profile.appendChild(contact);
+  }
+
+  // Ajouter les réseaux sociaux
+
+  profile.appendChild(createSocialLinks(seller));
+
+  return profile;
 }
 
 
@@ -579,7 +743,7 @@ function renderShops() {
 }
 
 
-// AFFICHER LES PRODUITS
+// CRÉER UNE CARTE PRODUIT
 
 function createProductCard(product) {
 
@@ -617,8 +781,7 @@ function createProductCard(product) {
 
   const stock = document.createElement("p");
   stock.className = "stock";
-  stock.textContent =
-    "Stock disponible : " + (product.stock ?? 0);
+  stock.textContent = "Stock disponible : " + (product.stock ?? 0);
 
   const sellerInfo = document.createElement("div");
   sellerInfo.className = "seller-info";
@@ -642,14 +805,7 @@ function createProductCard(product) {
 
   sellerInfo.append(label, shopName, shopButton);
 
-  info.append(
-    name,
-    category,
-    description,
-    price,
-    stock,
-    sellerInfo
-  );
+  info.append(name, category, description, price, stock, sellerInfo);
 
   const link = whatsappLink(seller.whatsapp, product.name);
 
@@ -678,6 +834,8 @@ function createProductCard(product) {
   return card;
 }
 
+
+// AFFICHER LES PRODUITS
 
 function renderProducts(products) {
 
@@ -718,7 +876,31 @@ function applyFilters() {
 }
 
 
-// PAGE INDIVIDUELLE DU VENDEUR
+// AFFICHER LES PRODUITS D'UNE BOUTIQUE
+
+function renderShopProducts(sellerId) {
+
+  const sellerProducts = allProducts.filter(function(product) {
+    return product.seller_id === sellerId;
+  });
+
+  shopProductsContainer.innerHTML = "";
+
+  if (!sellerProducts.length) {
+
+    shopProductsContainer.innerHTML =
+      '<div class="message">Cette boutique n’a pas encore de produit disponible.</div>';
+
+    return;
+  }
+
+  sellerProducts.forEach(function(product) {
+    shopProductsContainer.appendChild(createProductCard(product));
+  });
+}
+
+
+// AFFICHER UNE BOUTIQUE
 
 function showShop(sellerId) {
 
@@ -738,71 +920,34 @@ function showShop(sellerId) {
     "?vendeur=" + encodeURIComponent(sellerId)
   );
 
-  const profile = document.createElement("div");
-  profile.className = "shop-profile";
-
-  const logo = document.createElement("img");
-  logo.className = "shop-logo";
-  logo.src = seller.shop_logo_url || defaultLogo();
-  logo.alt = "Logo de la boutique";
-
-  logo.onerror = function() {
-    logo.src = defaultLogo();
-  };
-
-  const title = document.createElement("h2");
-  title.textContent = seller.shop_name || "Boutique partenaire";
-
-  const description = document.createElement("p");
-  description.textContent =
-    seller.shop_description || "Aucune présentation disponible.";
-
-  profile.append(logo, title, description);
-
-  if (seller.physical_address) {
-
-    const address = document.createElement("p");
-    address.textContent = "📍 Adresse : " + seller.physical_address;
-
-    profile.appendChild(address);
-  }
-
-  const link = whatsappLink(seller.whatsapp);
-
-  if (link) {
-
-    const contact = document.createElement("a");
-    contact.className = "whatsapp-btn profile-contact";
-    contact.href = link;
-    contact.target = "_blank";
-    contact.rel = "noopener noreferrer";
-    contact.textContent = "Contacter cette boutique sur WhatsApp";
-
-    profile.appendChild(contact);
-  }
-
   shopDetails.innerHTML = "";
-  shopDetails.appendChild(profile);
+  shopDetails.appendChild(getShopProfileElement(seller));
 
-  const sellerProducts = allProducts.filter(function(product) {
-    return product.seller_id === sellerId;
-  });
-
-  shopProductsContainer.innerHTML = "";
-
-  if (!sellerProducts.length) {
-
-    shopProductsContainer.innerHTML =
-      '<div class="message">Cette boutique n’a pas encore de produit disponible.</div>';
-
-  } else {
-
-    sellerProducts.forEach(function(product) {
-      shopProductsContainer.appendChild(createProductCard(product));
-    });
-  }
+  renderShopProducts(sellerId);
 
   window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+
+// OUVERTURE DIRECTE D'UNE BOUTIQUE
+
+function showShopWithoutHistory(sellerId) {
+
+  const seller = getSeller(sellerId);
+
+  if (!seller.id) {
+    mainPage.classList.remove("hidden");
+    shopPage.classList.add("hidden");
+    return;
+  }
+
+  mainPage.classList.add("hidden");
+  shopPage.classList.remove("hidden");
+
+  shopDetails.innerHTML = "";
+  shopDetails.appendChild(getShopProfileElement(seller));
+
+  renderShopProducts(sellerId);
 }
 
 
@@ -831,8 +976,6 @@ async function loadMarketplace() {
 
   try {
 
-    // Récupérer les produits actifs.
-
     const { data: products, error: productError } = await db
       .from("products")
       .select("id, seller_id, name, description, price, category, image_url, stock, created_at")
@@ -845,18 +988,28 @@ async function loadMarketplace() {
 
     allProducts = products || [];
 
-    // Récupérer les profils publics des vendeurs.
+    // Charger les profils publics et leurs réseaux sociaux.
 
     const { data: sellers, error: sellerError } = await db
       .from("public_seller_profiles")
-      .select("id, shop_name, whatsapp, shop_description, shop_logo_url, physical_address");
+      .select(`
+        id,
+        shop_name,
+        whatsapp,
+        shop_description,
+        shop_logo_url,
+        physical_address,
+        facebook_url,
+        instagram_url,
+        tiktok_url,
+        youtube_url
+      `);
 
     if (sellerError) {
       throw new Error("Boutiques : " + sellerError.message);
     }
 
     allSellers = sellers || [];
-
     sellerProfiles = {};
 
     allSellers.forEach(function(seller) {
@@ -888,7 +1041,7 @@ async function loadMarketplace() {
     renderShops();
     renderProducts(allProducts);
 
-    // Ouvrir directement une boutique si l'URL contient son identifiant.
+    // Ouvrir directement une boutique depuis son URL.
 
     const params = new URLSearchParams(window.location.search);
     const sellerId = params.get("vendeur");
@@ -912,75 +1065,6 @@ async function loadMarketplace() {
 }
 
 
-// OUVERTURE DIRECTE D'UNE BOUTIQUE
-
-function showShopWithoutHistory(sellerId) {
-
-  const seller = getSeller(sellerId);
-
-  if (!seller.id) return;
-
-  mainPage.classList.add("hidden");
-  shopPage.classList.remove("hidden");
-
-  const profile = document.createElement("div");
-  profile.className = "shop-profile";
-
-  const logo = document.createElement("img");
-  logo.className = "shop-logo";
-  logo.src = seller.shop_logo_url || defaultLogo();
-
-  logo.onerror = function() {
-    logo.src = defaultLogo();
-  };
-
-  const title = document.createElement("h2");
-  title.textContent = seller.shop_name || "Boutique partenaire";
-
-  const description = document.createElement("p");
-  description.textContent =
-    seller.shop_description || "Aucune présentation disponible.";
-
-  profile.append(logo, title, description);
-
-  if (seller.physical_address) {
-    const address = document.createElement("p");
-    address.textContent = "📍 Adresse : " + seller.physical_address;
-    profile.appendChild(address);
-  }
-
-  const link = whatsappLink(seller.whatsapp);
-
-  if (link) {
-    const contact = document.createElement("a");
-    contact.className = "whatsapp-btn profile-contact";
-    contact.href = link;
-    contact.target = "_blank";
-    contact.rel = "noopener noreferrer";
-    contact.textContent = "Contacter cette boutique sur WhatsApp";
-    profile.appendChild(contact);
-  }
-
-  shopDetails.innerHTML = "";
-  shopDetails.appendChild(profile);
-
-  const sellerProducts = allProducts.filter(function(product) {
-    return product.seller_id === sellerId;
-  });
-
-  shopProductsContainer.innerHTML = "";
-
-  if (!sellerProducts.length) {
-    shopProductsContainer.innerHTML =
-      '<div class="message">Cette boutique n’a pas encore de produit disponible.</div>';
-  } else {
-    sellerProducts.forEach(function(product) {
-      shopProductsContainer.appendChild(createProductCard(product));
-    });
-  }
-}
-
-
 // NAVIGATION DU NAVIGATEUR
 
 window.addEventListener("popstate", function() {
@@ -997,7 +1081,7 @@ window.addEventListener("popstate", function() {
 });
 
 
-// ÉCOUTE DES FILTRES
+// FILTRES
 
 searchInput.addEventListener("input", applyFilters);
 categoryFilter.addEventListener("change", applyFilters);
