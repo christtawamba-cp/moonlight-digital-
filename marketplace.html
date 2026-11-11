@@ -5,13 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#050505">
 <meta name="description" content="Découvrez les boutiques et les produits sur Moonlight Digital.">
-
 <title>Marketplace | Moonlight Digital</title>
-
 <link rel="canonical" href="https://christtawamba-cp.github.io/moonlight-digital/marketplace.html">
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 * {
   box-sizing: border-box;
@@ -19,225 +15,229 @@
   padding: 0;
   font-family: Arial, sans-serif;
 }
-
 body {
-  background: #050505;
+  background: #080808;
   color: white;
   min-height: 100vh;
 }
-
 header {
   text-align: center;
-  padding: 30px 15px;
-  background: #080808;
+  padding: 35px 15px;
+  background: linear-gradient(135deg, #080808, #19150a);
   border-bottom: 1px solid #292929;
 }
-
 header h1 {
   color: #d4af37;
-  font-size: 28px;
+  font-size: 29px;
+  letter-spacing: 1px;
 }
-
 header p {
   color: #aaa;
-  margin-top: 8px;
+  margin-top: 9px;
+  font-size: 14px;
 }
-
 .top-buttons {
   margin-top: 20px;
 }
-
 .top-buttons a,
 .nav-btn {
   display: inline-block;
   margin: 5px;
-  padding: 11px 20px;
+  padding: 12px 20px;
   border-radius: 25px;
   text-decoration: none;
   font-weight: bold;
   font-size: 13px;
   cursor: pointer;
 }
-
 .home-btn {
   color: white;
   border: 1px solid #d4af37;
 }
-
 .seller-btn {
   background: #d4af37;
   color: #050505;
 }
-
 .container {
-  max-width: 1150px;
+  max-width: 1200px;
   margin: auto;
   padding: 35px 18px;
 }
-
 .intro {
   text-align: center;
   margin-bottom: 30px;
 }
-
 .intro h2 {
   color: #d4af37;
   font-size: 30px;
   margin-bottom: 10px;
 }
-
 .intro p {
   color: #aaa;
+  line-height: 1.6;
 }
-
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin: 25px 0 35px;
+}
+.stat-card {
+  background: #141414;
+  border: 1px solid #333;
+  border-radius: 13px;
+  padding: 20px;
+  text-align: center;
+}
+.stat-card strong {
+  display: block;
+  color: #d4af37;
+  font-size: 27px;
+  margin-bottom: 6px;
+}
+.stat-card span {
+  color: #aaa;
+  font-size: 13px;
+}
 .section-title {
   color: #d4af37;
-  margin: 30px 0 18px;
+  margin: 35px 0 18px;
   font-size: 23px;
 }
-
 .filters {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 12px;
-  margin-bottom: 30px;
+  margin: 20px 0;
 }
-
 input, select {
   width: 100%;
   padding: 14px;
-  background: #111;
+  background: #151515;
   color: white;
-  border: 1px solid #333;
+  border: 1px solid #383838;
   border-radius: 10px;
   outline: none;
 }
-
 input:focus, select:focus {
   border-color: #d4af37;
 }
-
 .products,
 .shops {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
   gap: 22px;
 }
-
 .product,
 .shop-card {
-  background: #111;
+  background: #141414;
   border: 1px solid #292929;
   border-radius: 15px;
   overflow: hidden;
-  transition: 0.3s;
+  transition: .25s;
 }
-
 .product:hover,
 .shop-card:hover {
   transform: translateY(-4px);
   border-color: #d4af37;
+  box-shadow: 0 8px 25px rgba(212,175,55,.08);
 }
-
-/* IMAGES DES PRODUITS */
 .product img {
   width: 100%;
-  height: 140px;
+  height: 205px;
   object-fit: contain;
-  background: #191919;
-  padding: 5px;
+  background: #1b1b1b;
+  padding: 10px;
 }
-
 .product-info {
-  padding: 18px;
+  padding: 17px;
 }
-
 .product-info h3 {
-  color: #d4af37;
-  margin-bottom: 8px;
+  color: #fff;
+  font-size: 17px;
+  margin-bottom: 10px;
   overflow-wrap: anywhere;
 }
-
 .category {
   display: inline-block;
   color: #d4af37;
-  background: #252014;
-  padding: 5px 9px;
+  background: #292313;
+  padding: 6px 10px;
   border-radius: 20px;
   font-size: 11px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
-
 .description {
   color: #aaa;
-  font-size: 14px;
-  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 13px;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
-
 .price {
-  font-size: 21px;
+  font-size: 23px;
   font-weight: bold;
-  color: white;
-  margin-bottom: 8px;
+  color: #d4af37;
+  margin-bottom: 9px;
 }
-
 .stock {
-  color: #999;
-  font-size: 13px;
-  margin-bottom: 15px;
+  font-size: 12px;
+  margin-bottom: 13px;
 }
-
+.stock.available {
+  color: #36d58a;
+}
+.stock.out {
+  color: #ff7777;
+}
 .seller-info {
   border-top: 1px solid #333;
   padding-top: 13px;
   margin-top: 12px;
-  margin-bottom: 13px;
 }
-
 .seller-label {
   color: #888;
   font-size: 12px;
   margin-bottom: 5px;
 }
-
 .shop-name {
   color: #d4af37;
   font-size: 15px;
   font-weight: bold;
   overflow-wrap: anywhere;
 }
-
 .whatsapp-btn {
   display: block;
   width: 100%;
-  padding: 12px;
+  padding: 13px;
   background: #25D366;
-  color: #fff;
+  color: white;
   text-decoration: none;
   text-align: center;
   font-size: 14px;
   font-weight: bold;
-  border-radius: 8px;
-  margin-top: 10px;
+  border-radius: 9px;
+  margin-top: 13px;
+  border: none;
+  cursor: pointer;
 }
-
+.whatsapp-btn:hover {
+  background: #1eb85a;
+}
 .no-contact {
   color: #888;
   font-size: 12px;
   text-align: center;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid #333;
   border-radius: 8px;
-  margin-top: 10px;
+  margin-top: 12px;
 }
-
 .shop-card {
-  padding: 20px;
+  padding: 22px;
   text-align: center;
 }
-
 .shop-logo {
   width: 105px;
   height: 105px;
@@ -245,73 +245,65 @@ input:focus, select:focus {
   object-fit: cover;
   background: #252525;
   border: 2px solid #d4af37;
-  margin-bottom: 12px;
+  margin-bottom: 13px;
 }
-
 .shop-card h3 {
   color: #d4af37;
   margin-bottom: 8px;
   overflow-wrap: anywhere;
 }
-
 .shop-card p {
   color: #aaa;
   font-size: 13px;
+  line-height: 1.5;
   margin-bottom: 12px;
   overflow-wrap: anywhere;
 }
-
 .view-shop-btn {
   display: block;
   width: 100%;
-  padding: 12px;
+  padding: 13px;
   border: none;
-  border-radius: 8px;
+  border-radius: 9px;
   background: #d4af37;
   color: #050505;
   font-weight: bold;
   cursor: pointer;
+  margin-top: 12px;
 }
-
 .shop-profile {
-  background: #111;
+  background: #141414;
   border: 1px solid #333;
   border-radius: 15px;
   padding: 25px;
   text-align: center;
   margin-bottom: 30px;
 }
-
 .shop-profile .shop-logo {
   width: 125px;
   height: 125px;
 }
-
 .shop-profile h2 {
   color: #d4af37;
   margin: 10px 0;
   overflow-wrap: anywhere;
 }
-
 .shop-profile p {
   color: #bbb;
   margin: 10px 0;
+  line-height: 1.6;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
-
 .profile-contact {
   margin: 15px auto;
   max-width: 450px;
 }
-
 .back-btn {
   background: transparent;
   color: #d4af37;
   border: 1px solid #d4af37;
 }
-
-/* RESEAUX SOCIAUX DES BOUTIQUES */
 .social-links {
   display: flex;
   justify-content: center;
@@ -319,7 +311,6 @@ input:focus, select:focus {
   gap: 12px;
   margin: 18px auto;
 }
-
 .social-links a {
   display: inline-flex;
   align-items: center;
@@ -333,163 +324,189 @@ input:focus, select:focus {
   text-decoration: none;
   font-size: 17px;
   font-weight: bold;
-  transition: 0.3s;
 }
-
-.social-links a:hover {
-  background: #d4af37;
-  color: #050505;
-  transform: translateY(-3px);
-}
-
-.social-links a span {
-  font-size: 12px;
-}
-
 .message {
   text-align: center;
   color: #aaa;
   padding: 35px 10px;
   grid-column: 1 / -1;
+  line-height: 1.6;
   overflow-wrap: anywhere;
 }
-
 .error {
   color: #ff7777;
 }
-
 .hidden {
   display: none !important;
 }
-
 footer {
   border-top: 1px solid #292929;
-  padding: 25px;
+  padding: 28px 15px;
   text-align: center;
   color: #777;
   font-size: 13px;
-  margin-top: 40px;
+  line-height: 1.8;
+  margin-top: 45px;
 }
-
-@media (max-width: 600px) {
+@media(max-width:750px) {
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+  .filters input {
+    grid-column: 1 / -1;
+  }
+}
+@media(max-width:500px) {
   header h1 {
     font-size: 23px;
   }
-
-  .filters {
-    grid-template-columns: 1fr;
+  .container {
+    padding: 25px 13px;
   }
-
+  .intro h2 {
+    font-size: 25px;
+  }
+  .products,
+  .shops {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+  }
   .product img {
-    height: 120px;
+    height: 135px;
+  }
+  .product-info {
+    padding: 11px;
+  }
+  .product-info h3 {
+    font-size: 14px;
+  }
+  .price {
+    font-size: 18px;
+  }
+  .description {
+    font-size: 12px;
+  }
+  .shop-card {
+    padding: 13px 9px;
+  }
+  .shop-logo {
+    width: 75px;
+    height: 75px;
+  }
+  .shop-card h3 {
+    font-size: 14px;
+  }
+  .shop-card p {
+    font-size: 11px;
+  }
+  .view-shop-btn,
+  .whatsapp-btn {
+    font-size: 11px;
+    padding: 11px 6px;
+  }
+  .stats {
+    gap: 9px;
+  }
+  .stat-card {
+    padding: 15px 8px;
+  }
+  .stat-card strong {
+    font-size: 22px;
+  }
+  .stat-card span {
+    font-size: 11px;
   }
 }
 </style>
 </head>
-
 <body>
-
 <header>
   <h1>🌙 MOONLIGHT DIGITAL</h1>
   <p>MARKETPLACE — Achetez et découvrez des produits.</p>
-
   <div class="top-buttons">
     <a href="index.html" class="home-btn">← Accueil</a>
     <a href="espace-vendeur.html" class="seller-btn">+ Vendre un produit</a>
   </div>
 </header>
-
 <main class="container">
-
-  <section id="mainPage">
-
-    <div class="intro">
-      <h2>Notre Marketplace</h2>
-      <p>Découvrez les boutiques et les produits de nos vendeurs.</p>
+<section id="mainPage">
+  <div class="intro">
+    <h2>Notre Marketplace</h2>
+    <p>Découvrez les boutiques et les produits de nos vendeurs.</p>
+  </div>
+  <div class="stats">
+    <div class="stat-card">
+      <strong id="productCount">0</strong>
+      <span>Produits disponibles</span>
     </div>
-
-    <h2 class="section-title">🏪 Nos boutiques</h2>
-
-    <section class="shops" id="shops">
-      <div class="message">Chargement des boutiques...</div>
-    </section>
-
-    <h2 class="section-title">🛍️ Tous les produits</h2>
-
-    <section class="filters">
-      <input
-        type="search"
-        id="searchInput"
-        placeholder="🔍 Rechercher un produit..."
-      >
-
-      <select id="categoryFilter">
-        <option value="">Toutes les catégories</option>
-      </select>
-    </section>
-
-    <section class="products" id="products">
-      <div class="message">Chargement des produits...</div>
-    </section>
-
+<div class="stat-card">
+  <strong id="shopCount">0</strong>
+  <span>Boutiques partenaires</span>
+</div>
+  </div>
+  <h2 class="section-title">🏪 Nos boutiques</h2>
+  <section class="shops" id="shops">
+    <div class="message">Chargement des boutiques...</div>
   </section>
-
-  <section id="shopPage" class="hidden">
-
-    <button class="nav-btn back-btn" onclick="showMainPage()">
-      ← Retour aux boutiques
-    </button>
-
-    <div id="shopDetails"></div>
-
-    <h2 class="section-title">Les produits de cette boutique</h2>
-
-    <section class="products" id="shopProducts">
-      <div class="message">Chargement...</div>
-    </section>
-
+  <h2 class="section-title">🛍️ Tous les produits</h2>
+  <section class="filters">
+<input
+  type="search"
+  id="searchInput"
+  placeholder="🔍 Rechercher un produit ou une boutique..."
+>
+<select id="categoryFilter">
+  <option value="">Toutes les catégories</option>
+</select>
+<select id="sortFilter">
+  <option value="newest">Plus récents</option>
+  <option value="price-asc">Prix croissant</option>
+  <option value="price-desc">Prix décroissant</option>
+  <option value="name">Ordre alphabétique</option>
+</select>
   </section>
-
+  <section class="products" id="products">
+    <div class="message">Chargement des produits...</div>
+  </section>
+</section>
+<section id="shopPage" class="hidden">
+  <button class="nav-btn back-btn" onclick="showMainPage()">
+    ← Retour aux boutiques
+  </button>
+  <div id="shopDetails"></div>
+  <h2 class="section-title">Les produits de cette boutique</h2>
+  <section class="products" id="shopProducts"></section>
+</section>
 </main>
-
 <footer>
   © 2026 Moonlight Digital — Tous droits réservés.
   <br>
   Votre commerce, notre plateforme.
 </footer>
-
 <script>
-
 // CONFIGURATION SUPABASE
-
 const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
-
 const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
-
 const db = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
-
 // ÉLÉMENTS HTML
-
 const productsContainer = document.getElementById("products");
 const shopsContainer = document.getElementById("shops");
 const shopProductsContainer = document.getElementById("shopProducts");
-
 const searchInput = document.getElementById("searchInput");
 const categoryFilter = document.getElementById("categoryFilter");
-
+const sortFilter = document.getElementById("sortFilter");
 const mainPage = document.getElementById("mainPage");
 const shopPage = document.getElementById("shopPage");
 const shopDetails = document.getElementById("shopDetails");
-
+const productCount = document.getElementById("productCount");
+const shopCount = document.getElementById("shopCount");
 let allProducts = [];
 let allSellers = [];
 let sellerProfiles = {};
-
 // OUTILS
-
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>"']/g, function(character) {
     return {
@@ -501,39 +518,28 @@ function escapeHTML(value) {
     }[character];
   });
 }
-
 function displayPrice(price) {
   const amount = Number(price);
-
   if (!Number.isFinite(amount)) {
     return "Prix à confirmer";
   }
-
   return amount.toLocaleString("fr-FR") + " $";
 }
-
 function whatsappLink(phone, productName = "") {
-
   if (!phone) return null;
-
   let number = String(phone).replace(/\D/g, "");
-
   if (number.startsWith("0")) {
     number = "243" + number.substring(1);
   }
-
   if (!number || number.length < 8) {
     return null;
   }
-
   const message = productName
     ? "Bonjour, je suis intéressé(e) par votre produit : " + productName
     : "Bonjour, je souhaite avoir des informations sur votre boutique.";
-
   return "https://wa.me/" + number +
     "?text=" + encodeURIComponent(message);
 }
-
 function defaultLogo() {
   return "data:image/svg+xml;charset=UTF-8," +
     encodeURIComponent(
@@ -543,18 +549,13 @@ function defaultLogo() {
       '</svg>'
     );
 }
-
 function getSeller(id) {
   return sellerProfiles[id] || {};
 }
-
-// RESEAUX SOCIAUX DES BOUTIQUES
-
+// LIENS SOCIAUX
 function createSocialLinks(seller) {
-
   const container = document.createElement("div");
   container.className = "social-links";
-
   const networks = [
     {
       name: "Facebook",
@@ -581,388 +582,315 @@ function createSocialLinks(seller) {
       hosts: ["youtube.com", "www.youtube.com", "youtu.be"]
     }
   ];
-
   networks.forEach(function(network) {
-
     const value = seller[network.field];
-
     if (!value) return;
-
     try {
-
       const url = new URL(value);
-
       if (
         url.protocol !== "https:" ||
         !network.hosts.includes(url.hostname.toLowerCase())
       ) {
         return;
       }
-
       const link = document.createElement("a");
       link.href = url.href;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
       link.title = network.name;
       link.setAttribute("aria-label", network.name);
-
-      const label = document.createElement("span");
-      label.textContent = network.label;
-
-      link.appendChild(label);
+      link.textContent = network.label;
       container.appendChild(link);
-
     } catch (error) {
       console.warn("Lien social invalide :", network.name);
     }
-
   });
-
-  if (!container.children.length) {
-    return null;
-  }
-
-  return container;
+  return container.children.length ? container : null;
 }
-
-// AFFICHER LES BOUTIQUES
-
+// BOUTIQUES
 function renderShops() {
-
   shopsContainer.innerHTML = "";
-
   if (!allSellers.length) {
     shopsContainer.innerHTML =
       '<div class="message">Aucune boutique disponible pour le moment.</div>';
     return;
   }
-
   allSellers.forEach(function(seller) {
-
     const card = document.createElement("article");
     card.className = "shop-card";
-
     const logo = document.createElement("img");
     logo.className = "shop-logo";
     logo.src = seller.shop_logo_url || defaultLogo();
-    logo.alt = "Logo " + (seller.shop_name || "boutique");
-
+    logo.alt = "Logo boutique";
     logo.onerror = function() {
       logo.src = defaultLogo();
     };
-
     const title = document.createElement("h3");
     title.textContent = seller.shop_name || "Boutique partenaire";
-
     const description = document.createElement("p");
     description.textContent =
-      seller.shop_description || "Découvrez les produits de cette boutique.";
-
+      seller.shop_description || "Découvrez nos produits.";
     const count = allProducts.filter(function(product) {
-      return product.seller_id === seller.id;
+      return product.seller_id === seller.id &&
+        Number(product.stock) > 0;
     }).length;
-
     const quantity = document.createElement("p");
-    quantity.textContent = count + " produit(s) disponible(s)";
-
+    quantity.textContent = count + " produit(s) en stock";
     const button = document.createElement("button");
     button.className = "view-shop-btn";
     button.textContent = "Voir la boutique";
-
     button.onclick = function() {
       showShop(seller.id);
     };
-
     card.append(logo, title, description, quantity, button);
     shopsContainer.appendChild(card);
-
   });
 }
-
-// AFFICHER LES PRODUITS
-
+// PRODUITS
 function createProductCard(product) {
-
   const seller = getSeller(product.seller_id);
-
   const card = document.createElement("article");
   card.className = "product";
-
   const image = document.createElement("img");
   image.src = product.image_url || defaultLogo();
   image.alt = product.name || "Produit";
-
   image.onerror = function() {
     image.src = defaultLogo();
   };
-
   const info = document.createElement("div");
   info.className = "product-info";
-
   const name = document.createElement("h3");
   name.textContent = product.name || "Produit sans nom";
-
   const category = document.createElement("span");
   category.className = "category";
   category.textContent = product.category || "Autre";
-
   const description = document.createElement("p");
   description.className = "description";
   description.textContent =
     product.description || "Aucune description disponible.";
-
   const price = document.createElement("p");
   price.className = "price";
   price.textContent = displayPrice(product.price);
-
   const stock = document.createElement("p");
-  stock.className = "stock";
-  stock.textContent =
-    "Stock disponible : " + (product.stock ?? 0);
-
+  const quantity = Number(product.stock) || 0;
+  stock.className = quantity > 0 ? "stock available" : "stock out";
+  stock.textContent = quantity > 0
+    ? "✓ En stock : " + quantity
+    : "✕ Rupture de stock";
   const sellerInfo = document.createElement("div");
   sellerInfo.className = "seller-info";
-
   const label = document.createElement("p");
   label.className = "seller-label";
   label.textContent = "Vendu par :";
-
   const shopName = document.createElement("p");
   shopName.className = "shop-name";
   shopName.textContent = seller.shop_name || "Boutique partenaire";
-
   const shopButton = document.createElement("button");
   shopButton.className = "view-shop-btn";
-  shopButton.style.marginTop = "10px";
   shopButton.textContent = "Voir la boutique";
-
   shopButton.onclick = function() {
     showShop(product.seller_id);
   };
-
   sellerInfo.append(label, shopName, shopButton);
-
-  info.append(
-    name,
-    category,
-    description,
-    price,
-    stock,
-    sellerInfo
-  );
-
-  const link = whatsappLink(seller.whatsapp, product.name);
-
+  info.append(name, category, description, price, stock, sellerInfo);
+  const link = quantity > 0
+    ? whatsappLink(seller.whatsapp, product.name)
+    : null;
   if (link) {
-
     const contact = document.createElement("a");
     contact.className = "whatsapp-btn";
     contact.href = link;
     contact.target = "_blank";
     contact.rel = "noopener noreferrer";
     contact.textContent = "Contacter sur WhatsApp";
-
     info.appendChild(contact);
-
   } else {
-
     const noContact = document.createElement("p");
     noContact.className = "no-contact";
-    noContact.textContent = "Contact vendeur indisponible";
-
+    noContact.textContent = quantity <= 0
+      ? "Produit indisponible"
+      : "Contact vendeur indisponible";
     info.appendChild(noContact);
   }
-
   card.append(image, info);
-
   return card;
 }
-
+// AFFICHAGE DES PRODUITS
 function renderProducts(products) {
-
   productsContainer.innerHTML = "";
-
   if (!products.length) {
     productsContainer.innerHTML =
-      '<div class="message">Aucun produit trouvé.</div>';
+      '<div class="message">Aucun produit ne correspond à votre recherche.</div>';
     return;
   }
-
   products.forEach(function(product) {
     productsContainer.appendChild(createProductCard(product));
   });
 }
-
-// FILTRES
-
+// RECHERCHE, FILTRES ET TRI
 function applyFilters() {
-
   const search = searchInput.value.trim().toLowerCase();
   const category = categoryFilter.value;
-
-  const filtered = allProducts.filter(function(product) {
-
-    const matchesSearch =
-      (product.name || "").toLowerCase().includes(search) ||
-      (product.description || "").toLowerCase().includes(search);
-
+  const sort = sortFilter.value;
+  let filtered = allProducts.filter(function(product) {
+    const seller = getSeller(product.seller_id);
+    const searchText = [
+      product.name,
+      product.description,
+      product.category,
+      seller.shop_name
+    ].join(" ").toLowerCase();
+    const matchesSearch = searchText.includes(search);
     const matchesCategory =
       !category || product.category === category;
-
     return matchesSearch && matchesCategory;
   });
-
+  if (sort === "price-asc") {
+    filtered.sort((a, b) => Number(a.price) - Number(b.price));
+  }
+  if (sort === "price-desc") {
+    filtered.sort((a, b) => Number(b.price) - Number(a.price));
+  }
+  if (sort === "name") {
+    filtered.sort((a, b) =>
+      (a.name || "").localeCompare(b.name || "", "fr")
+    );
+  }
+  if (sort === "newest") {
+    filtered.sort((a, b) =>
+      new Date(b.created_at) - new Date(a.created_at)
+    );
+  }
   renderProducts(filtered);
 }
-
-// PAGE INDIVIDUELLE DU VENDEUR
-
-function showShop(sellerId) {
-
-  const seller = getSeller(sellerId);
-
-  if (!seller.id) {
-    alert("Cette boutique est introuvable.");
-    return;
-  }
-
-  mainPage.classList.add("hidden");
-  shopPage.classList.remove("hidden");
-
-  history.pushState(
-    { sellerId: sellerId },
-    "",
-    "?vendeur=" + encodeURIComponent(sellerId)
-  );
-
+// PROFIL BOUTIQUE
+function buildShopProfile(seller) {
   const profile = document.createElement("div");
   profile.className = "shop-profile";
-
   const logo = document.createElement("img");
   logo.className = "shop-logo";
   logo.src = seller.shop_logo_url || defaultLogo();
-  logo.alt = "Logo de la boutique";
-
+  logo.alt = "Logo boutique";
   logo.onerror = function() {
     logo.src = defaultLogo();
   };
-
   const title = document.createElement("h2");
   title.textContent = seller.shop_name || "Boutique partenaire";
-
   const description = document.createElement("p");
   description.textContent =
     seller.shop_description || "Aucune présentation disponible.";
-
   profile.append(logo, title, description);
-
   const socialLinks = createSocialLinks(seller);
-
   if (socialLinks) {
     profile.appendChild(socialLinks);
   }
-
   if (seller.physical_address) {
-
     const address = document.createElement("p");
     address.textContent = "📍 Adresse : " + seller.physical_address;
-
     profile.appendChild(address);
   }
-
   const link = whatsappLink(seller.whatsapp);
-
   if (link) {
-
     const contact = document.createElement("a");
     contact.className = "whatsapp-btn profile-contact";
     contact.href = link;
     contact.target = "_blank";
     contact.rel = "noopener noreferrer";
     contact.textContent = "Contacter cette boutique sur WhatsApp";
-
     profile.appendChild(contact);
   }
-
-  shopDetails.innerHTML = "";
-  shopDetails.appendChild(profile);
-
+  return profile;
+}
+// PRODUITS D'UNE BOUTIQUE
+function renderShopProducts(sellerId) {
+  shopProductsContainer.innerHTML = "";
   const sellerProducts = allProducts.filter(function(product) {
     return product.seller_id === sellerId;
   });
-
-  shopProductsContainer.innerHTML = "";
-
   if (!sellerProducts.length) {
-
     shopProductsContainer.innerHTML =
       '<div class="message">Cette boutique n’a pas encore de produit disponible.</div>';
-
-  } else {
-
-    sellerProducts.forEach(function(product) {
-      shopProductsContainer.appendChild(createProductCard(product));
-    });
+    return;
   }
-
+  sellerProducts.forEach(function(product) {
+    shopProductsContainer.appendChild(createProductCard(product));
+  });
+}
+// OUVRIR UNE BOUTIQUE
+function showShop(sellerId) {
+  const seller = getSeller(sellerId);
+  if (!seller.id) {
+    alert("Cette boutique est introuvable.");
+    return;
+  }
+  mainPage.classList.add("hidden");
+  shopPage.classList.remove("hidden");
+  history.pushState(
+    { sellerId: sellerId },
+    "",
+    "?vendeur=" + encodeURIComponent(sellerId)
+  );
+  shopDetails.innerHTML = "";
+  shopDetails.appendChild(buildShopProfile(seller));
+  renderShopProducts(sellerId);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
-
-// RETOUR À LA MARKETPLACE
-
-function showMainPage() {
-
+// OUVERTURE DIRECTE D'UNE BOUTIQUE
+function showShopWithoutHistory(sellerId) {
+  const seller = getSeller(sellerId);
+  if (!seller.id) {
+    showMainPageWithoutHistory();
+    return;
+  }
+  mainPage.classList.add("hidden");
+  shopPage.classList.remove("hidden");
+  shopDetails.innerHTML = "";
+  shopDetails.appendChild(buildShopProfile(seller));
+  renderShopProducts(sellerId);
+}
+function showMainPageWithoutHistory() {
   mainPage.classList.remove("hidden");
   shopPage.classList.add("hidden");
-
+}
+// RETOUR MARKETPLACE
+function showMainPage() {
+  showMainPageWithoutHistory();
   history.pushState({}, "", "marketplace.html");
-
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
-
 // CHARGEMENT DES DONNÉES
-
 async function loadMarketplace() {
-
   productsContainer.innerHTML =
     '<div class="message">Chargement des produits...</div>';
-
   shopsContainer.innerHTML =
     '<div class="message">Chargement des boutiques...</div>';
-
   try {
-
     const { data: products, error: productError } = await db
       .from("products")
       .select("id, seller_id, name, description, price, category, image_url, stock, created_at")
       .eq("status", "active")
       .order("created_at", { ascending: false });
-
     if (productError) {
       throw new Error("Produits : " + productError.message);
     }
-
     allProducts = products || [];
-
     const { data: sellers, error: sellerError } = await db
       .from("public_seller_profiles")
       .select("id, shop_name, whatsapp, shop_description, shop_logo_url, physical_address, facebook_url, instagram_url, tiktok_url, youtube_url");
-
     if (sellerError) {
       throw new Error("Boutiques : " + sellerError.message);
     }
-
     allSellers = sellers || [];
-
     sellerProfiles = {};
-
     allSellers.forEach(function(seller) {
       sellerProfiles[seller.id] = seller;
     });
-
+    productCount.textContent = allProducts.filter(function(product) {
+      return Number(product.stock) > 0;
+    }).length;
+    shopCount.textContent = allSellers.length;
     categoryFilter.innerHTML =
       '<option value="">Toutes les catégories</option>';
-
     const categories = [
       ...new Set(
         allProducts
@@ -970,139 +898,45 @@ async function loadMarketplace() {
           .filter(Boolean)
       )
     ].sort();
-
     categories.forEach(function(category) {
-
       const option = document.createElement("option");
       option.value = category;
       option.textContent = category;
-
       categoryFilter.appendChild(option);
     });
-
     renderShops();
-    renderProducts(allProducts);
-
+    applyFilters();
     const params = new URLSearchParams(window.location.search);
     const sellerId = params.get("vendeur");
-
     if (sellerId) {
       showShopWithoutHistory(sellerId);
     }
-
   } catch (error) {
-
     console.error(error);
-
     shopsContainer.innerHTML =
       '<div class="message error">' +
       escapeHTML(error.message) +
       '</div>';
-
     productsContainer.innerHTML =
-      '<div class="message error">Impossible de charger les produits.</div>';
+      '<div class="message error">Impossible de charger les produits. Vérifiez votre connexion et réessayez.</div>';
   }
 }
-
-// OUVERTURE DIRECTE D'UNE BOUTIQUE
-
-function showShopWithoutHistory(sellerId) {
-
-  const seller = getSeller(sellerId);
-
-  if (!seller.id) return;
-
-  mainPage.classList.add("hidden");
-  shopPage.classList.remove("hidden");
-
-  const profile = document.createElement("div");
-  profile.className = "shop-profile";
-
-  const logo = document.createElement("img");
-  logo.className = "shop-logo";
-  logo.src = seller.shop_logo_url || defaultLogo();
-
-  logo.onerror = function() {
-    logo.src = defaultLogo();
-  };
-
-  const title = document.createElement("h2");
-  title.textContent = seller.shop_name || "Boutique partenaire";
-
-  const description = document.createElement("p");
-  description.textContent =
-    seller.shop_description || "Aucune présentation disponible.";
-
-  profile.append(logo, title, description);
-
-  const socialLinks = createSocialLinks(seller);
-
-  if (socialLinks) {
-    profile.appendChild(socialLinks);
-  }
-
-  if (seller.physical_address) {
-    const address = document.createElement("p");
-    address.textContent = "📍 Adresse : " + seller.physical_address;
-    profile.appendChild(address);
-  }
-
-  const link = whatsappLink(seller.whatsapp);
-
-  if (link) {
-    const contact = document.createElement("a");
-    contact.className = "whatsapp-btn profile-contact";
-    contact.href = link;
-    contact.target = "_blank";
-    contact.rel = "noopener noreferrer";
-    contact.textContent = "Contacter cette boutique sur WhatsApp";
-    profile.appendChild(contact);
-  }
-
-  shopDetails.innerHTML = "";
-  shopDetails.appendChild(profile);
-
-  const sellerProducts = allProducts.filter(function(product) {
-    return product.seller_id === sellerId;
-  });
-
-  shopProductsContainer.innerHTML = "";
-
-  if (!sellerProducts.length) {
-    shopProductsContainer.innerHTML =
-      '<div class="message">Cette boutique n’a pas encore de produit disponible.</div>';
-  } else {
-    sellerProducts.forEach(function(product) {
-      shopProductsContainer.appendChild(createProductCard(product));
-    });
-  }
-}
-
 // NAVIGATION DU NAVIGATEUR
-
 window.addEventListener("popstate", function() {
-
   const params = new URLSearchParams(window.location.search);
   const sellerId = params.get("vendeur");
-
   if (sellerId) {
     showShopWithoutHistory(sellerId);
   } else {
-    mainPage.classList.remove("hidden");
-    shopPage.classList.add("hidden");
+    showMainPageWithoutHistory();
   }
 });
-
-// ÉCOUTE DES FILTRES
-
+// FILTRES
 searchInput.addEventListener("input", applyFilters);
 categoryFilter.addEventListener("change", applyFilters);
-
+sortFilter.addEventListener("change", applyFilters);
 // LANCEMENT
-
 loadMarketplace();
-
 </script>
-
 </body>
 </html>
