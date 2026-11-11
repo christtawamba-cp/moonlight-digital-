@@ -182,6 +182,7 @@
       color: #aaa;
       padding: 35px 10px;
       grid-column: 1 / -1;
+      overflow-wrap: anywhere;
     }
 
     .error {
@@ -325,7 +326,8 @@
 
       const description = document.createElement("p");
       description.className = "description";
-      description.textContent = product.description || "Aucune description disponible.";
+      description.textContent =
+        product.description || "Aucune description disponible.";
 
       const price = document.createElement("p");
       price.className = "price";
@@ -333,7 +335,8 @@
 
       const stock = document.createElement("p");
       stock.className = "stock";
-      stock.textContent = "Stock disponible : " + (product.stock ?? 0);
+      stock.textContent =
+        "Stock disponible : " + (product.stock ?? 0);
 
       info.appendChild(name);
       info.appendChild(category);
@@ -370,39 +373,60 @@
     productsContainer.innerHTML =
       '<div class="message">Chargement des produits...</div>';
 
-    const { data, error } = await db
-      .from("products")
-      .select("id, name, description, price, category, image_url, stock, created_at")
-      .eq("status", "active")
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await db
+        .from("products")
+        .select("id, name, description, price, category, image_url, stock, created_at")
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Erreur Supabase :", error);
+      if (error) {
+        console.error("Erreur Supabase :", error);
 
-      productsContainer.innerHTML =
-        '<div class="message error">Impossible de charger les produits. Réessayez plus tard.</div>';
+        productsContainer.innerHTML = `
+          <div class="message error">
+            Erreur : ${escapeHTML(error.message)}
+            <br><br>
+            Code : ${escapeHTML(error.code || "Inconnu")}
+          </div>
+        `;
 
-      return;
+        return;
+      }
+
+      allProducts = data || [];
+
+      categoryFilter.innerHTML =
+        '<option value="">Toutes les catégories</option>';
+
+      const categories = [
+        ...new Set(
+          allProducts
+            .map(product => product.category)
+            .filter(Boolean)
+        )
+      ].sort();
+
+      categories.forEach(function (category) {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        categoryFilter.appendChild(option);
+      });
+
+      renderProducts(allProducts);
+
+    } catch (error) {
+      console.error("Erreur inattendue :", error);
+
+      productsContainer.innerHTML = `
+        <div class="message error">
+          Impossible de contacter le serveur.
+          <br><br>
+          Détail : ${escapeHTML(error.message)}
+        </div>
+      `;
     }
-
-    allProducts = data || [];
-
-    const categories = [
-      ...new Set(
-        allProducts
-          .map(product => product.category)
-          .filter(Boolean)
-      )
-    ].sort();
-
-    categories.forEach(function (category) {
-      const option = document.createElement("option");
-      option.value = category;
-      option.textContent = category;
-      categoryFilter.appendChild(option);
-    });
-
-    renderProducts(allProducts);
   }
 
   searchInput.addEventListener("input", applyFilters);
