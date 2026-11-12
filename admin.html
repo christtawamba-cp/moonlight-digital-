@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Administration | Moonlight Digital</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#f3f5f9;color:#202938}
@@ -22,7 +23,7 @@ audio{width:100%;margin:12px 0}
 .status{font-weight:bold}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .actions select{flex:1;min-width:130px}
-.hidden{display:none}
+.hidden{display:none!important}
 .error{color:#b91c1c}
 .success{color:#15803d}
 .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
@@ -39,70 +40,186 @@ th{background:#f8fafc}
 .paid{color:#15803d;font-weight:bold}
 .unpaid{color:#b45309;font-weight:bold}
 .pay-button{background:#15803d;padding:8px 10px}
-.section-title{margin-top:25px}
 .message{margin:12px 0}
+.quick-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.quick-link{
+display:block;
+padding:18px;
+border:1px solid #e5e7eb;
+border-radius:10px;
+text-decoration:none;
+color:#172b4d;
+background:#fff;
+transition:.2s;
+}
+.quick-link:hover{border-color:#c49a35;transform:translateY(-2px)}
+.quick-link strong{display:block;margin-bottom:7px;font-size:16px}
+.quick-link span{font-size:13px;color:#667085}
+.gold{color:#b68b27}
+.media-button{background:#b68b27;color:white}
+.info-box{
+background:#fff8e7;
+border:1px solid #f3dfaa;
+padding:15px;
+border-radius:9px;
+margin-top:15px;
+font-size:14px;
+line-height:1.6;
+}
+@media(max-width:600px){
+header{padding:18px}
+main{padding:10px}
+.panel{padding:15px}
+.tabs button{flex:1}
+}
 </style>
 </head>
+
 <body>
+
 <header>
 <h1>🌙 MOONLIGHT DIGITAL</h1>
-<p>Espace administration</p>
+<p>Centre principal d'administration</p>
 </header>
+
 <main>
+
 <section id="loading" class="panel">
 Vérification de votre accès...
 </section>
+
 <section id="dashboard" class="hidden">
+
 <div class="panel">
-<h2>Bienvenue dans votre espace administrateur</h2>
+<h2>Bienvenue dans votre espace administrateur 👋</h2>
+<p>Gérez les différentes activités de Moonlight Digital depuis un seul endroit.</p>
+
 <div class="tabs">
-<button class="active" id="musicTab">🎵 Gestion musicale</button>
-<button id="marketTab">🛍️ Marketplace et commissions</button>
+<button class="active" id="homeTab">🏠 Accueil</button>
+<button id="musicTab">🎵 Musique</button>
+<button id="marketTab">🛍️ Marketplace</button>
+<button id="mediaTab">📰 Media</button>
 </div>
-<button id="refresh">Actualiser</button>
+
+<button id="refresh">🔄 Actualiser</button>
 <button id="logout">Déconnexion</button>
-<p id="message"></p>
+
+<p id="message" class="message"></p>
 </div>
-<div id="musicSection">
+
+<!-- ACCUEIL -->
+<div id="homeSection">
+
 <div class="panel">
+<h2>🚀 Centre de contrôle</h2>
+<p>Accédez rapidement aux différents services de votre plateforme.</p>
+
+<div class="quick-links">
+
+<a href="media-admin.html" class="quick-link">
+<strong>📰 <span class="gold">Moonlight Media</span></strong>
+<span>Publier et gérer les actualités, photos et vidéos.</span>
+</a>
+
+<a href="media.html" target="_blank" class="quick-link">
+<strong>🌐 Média public</strong>
+<span>Consulter le fil d'actualité public de Moonlight Digital.</span>
+</a>
+
+<a href="marketplace.html" target="_blank" class="quick-link">
+<strong>🛍️ Marketplace</strong>
+<span>Accéder à la boutique et aux produits publiés.</span>
+</a>
+
+<a href="espace-artiste.html" target="_blank" class="quick-link">
+<strong>🎤 Espace artiste</strong>
+<span>Consulter l'espace réservé aux artistes.</span>
+</a>
+
+<a href="index.html" target="_blank" class="quick-link">
+<strong>🏠 Site officiel</strong>
+<span>Voir la page d'accueil de Moonlight Digital.</span>
+</a>
+
+</div>
+</div>
+
+<div class="panel">
+<h2>🌙 Administration Moonlight Digital</h2>
+<p>
+Depuis cet espace, vous pouvez gérer les projets musicaux,
+suivre les activités de la marketplace et accéder à Moonlight Media.
+</p>
+
+<div class="info-box">
+<strong>Information :</strong><br>
+Les différents services peuvent avoir leurs propres autorisations
+et leurs propres espaces de gestion. Votre accès administrateur
+principal ne remplace pas automatiquement les autorisations
+spécifiques de chaque service.
+</div>
+</div>
+
+</div>
+
+<!-- GESTION MUSICALE -->
+<div id="musicSection" class="hidden">
+
+<div class="panel">
+<h2>🎵 Gestion musicale</h2>
 <h3>📁 Projets musicaux reçus</h3>
 <div id="releases">Chargement...</div>
 </div>
+
 </div>
+
+<!-- MARKETPLACE -->
 <div id="marketSection" class="hidden">
+
 <div class="panel">
 <h2>🛍️ Administration Marketplace</h2>
 <p>Suivi des vendeurs, ventes déclarées et commissions Moonlight Digital.</p>
+
 <p><strong>Commission de la plateforme : 10 %</strong></p>
+
 <div class="stats">
+
 <div class="stat">
 <p>Vendeurs inscrits</p>
 <strong id="sellerCount">0</strong>
 </div>
+
 <div class="stat">
 <p>Ventes déclarées</p>
 <strong id="salesCount">0</strong>
 </div>
+
 <div class="stat">
 <p>Chiffre d'affaires déclaré</p>
 <strong id="totalRevenue">0 $</strong>
 </div>
+
 <div class="stat">
 <p>Commissions totales</p>
 <strong id="totalCommission">0 $</strong>
 </div>
+
 <div class="stat">
 <p>Commissions payées</p>
 <strong id="paidCommission">0 $</strong>
 </div>
+
 <div class="stat">
 <p>Commissions impayées</p>
 <strong id="unpaidCommission">0 $</strong>
 </div>
+
 </div>
 </div>
+
 <div class="panel">
 <h3>👥 Vendeurs inscrits</h3>
+
 <div class="table-wrap">
 <table>
 <thead>
@@ -118,8 +235,10 @@ Vérification de votre accès...
 </table>
 </div>
 </div>
+
 <div class="panel">
 <h3>💰 Historique des ventes et commissions</h3>
+
 <div class="table-wrap">
 <table>
 <thead>
@@ -141,17 +260,60 @@ Vérification de votre accès...
 </table>
 </div>
 </div>
+
 </div>
+
+<!-- MOONLIGHT MEDIA -->
+<div id="mediaSection" class="hidden">
+
+<div class="panel">
+<h2>📰 Administration Moonlight Media</h2>
+
+<p>
+Gérez les publications et les actualités de votre média
+depuis cet espace.
+</p>
+
+<div class="quick-links">
+
+<a href="media-admin.html" class="quick-link">
+<strong>✍️ Publier un article</strong>
+<span>Accéder à l'espace de publication et ajouter du contenu.</span>
+</a>
+
+<a href="media.html" target="_blank" class="quick-link">
+<strong>🌐 Voir les publications</strong>
+<span>Consulter les publications visibles par le public.</span>
+</a>
+
+</div>
+
+<div class="info-box">
+<strong>Gestion des publications :</strong><br>
+L'espace Moonlight Media possède son propre contrôle d'accès.
+Cliquez sur « Publier un article » pour ouvrir votre interface
+de gestion des publications.
+</div>
+
+</div>
+
+</div>
+
 </section>
 </main>
+
 <script>
 const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
 const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
+
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const loading = document.getElementById("loading");
 const dashboard = document.getElementById("dashboard");
 const message = document.getElementById("message");
-let currentSection = "music";
+
+let currentSection = "home";
+
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>"']/g, char => ({
     "&":"&amp;",
@@ -161,95 +323,158 @@ function escapeHTML(value) {
     "'":"&#39;"
   })[char]);
 }
+
 function money(value) {
   return Number(value || 0).toLocaleString("fr-FR", {
     minimumFractionDigits:2,
     maximumFractionDigits:2
   }) + " $";
 }
+
 function showMessage(text, type = "success") {
-  message.className = type;
+  message.className = "message " + type;
   message.textContent = text;
 }
+
 async function initialize() {
+
   const {data:{session},error} = await db.auth.getSession();
+
   if(error || !session) {
     loading.textContent = "Connectez-vous d'abord à votre espace.";
     return;
   }
+
   const {data:isAdmin,error:adminError} = await db.rpc("is_admin");
+
   if(adminError || isAdmin !== true) {
-    loading.innerHTML = '<p class="error">Accès refusé. Cette page est réservée aux administrateurs.</p>';
+    loading.innerHTML =
+      '<p class="error">Accès refusé. Cette page est réservée aux administrateurs.</p>';
     return;
   }
+
   loading.classList.add("hidden");
   dashboard.classList.remove("hidden");
+
   await loadReleases();
 }
+
 function showSection(section) {
+
   currentSection = section;
+
+  document.getElementById("homeSection").classList.toggle("hidden", section !== "home");
   document.getElementById("musicSection").classList.toggle("hidden", section !== "music");
   document.getElementById("marketSection").classList.toggle("hidden", section !== "market");
+  document.getElementById("mediaSection").classList.toggle("hidden", section !== "media");
+
+  document.getElementById("homeTab").classList.toggle("active", section === "home");
   document.getElementById("musicTab").classList.toggle("active", section === "music");
   document.getElementById("marketTab").classList.toggle("active", section === "market");
+  document.getElementById("mediaTab").classList.toggle("active", section === "media");
+
   if(section === "market") loadMarketplace();
   if(section === "music") loadReleases();
 }
+
+document.getElementById("homeTab").addEventListener("click", () => showSection("home"));
 document.getElementById("musicTab").addEventListener("click", () => showSection("music"));
 document.getElementById("marketTab").addEventListener("click", () => showSection("market"));
+document.getElementById("mediaTab").addEventListener("click", () => showSection("media"));
+
 document.getElementById("refresh").addEventListener("click", () => {
+
   if(currentSection === "music") loadReleases();
-  else loadMarketplace();
+  else if(currentSection === "market") loadMarketplace();
+  else showMessage("Votre espace d'administration est actualisé.");
+
 });
+
 document.getElementById("logout").addEventListener("click", async () => {
+
   await db.auth.signOut();
   window.location.href = "espace-artiste.html";
+
 });
-/* GESTION MUSICALE */
+
+
+/* =================================
+   GESTION MUSICALE
+================================= */
+
 async function loadReleases() {
+
   const releasesDiv = document.getElementById("releases");
+
   releasesDiv.innerHTML = "Chargement des projets...";
+
   const {data:releases,error} = await db
     .from("releases")
     .select("*")
     .order("created_at",{ascending:false});
+
   if(error) {
-    releasesDiv.innerHTML = '<p class="error">Erreur : '+escapeHTML(error.message)+'</p>';
+    releasesDiv.innerHTML =
+      '<p class="error">Erreur : '+escapeHTML(error.message)+'</p>';
     return;
   }
+
   if(!releases || releases.length === 0) {
     releasesDiv.innerHTML = "Aucun projet reçu pour le moment.";
     return;
   }
+
   const {data:profiles} = await db
     .from("profiles")
     .select("id,full_name,artist_name");
+
   const profileMap = {};
+
   (profiles || []).forEach(p => profileMap[p.id] = p);
+
   releasesDiv.innerHTML = "";
+
   for(const release of releases) {
+
     const profile = profileMap[release.user_id] || {};
-    const artist = profile.artist_name || release.artist_name || profile.full_name || "Artiste";
+
+    const artist =
+      profile.artist_name ||
+      release.artist_name ||
+      profile.full_name ||
+      "Artiste";
+
     let audioHTML = "Audio non disponible";
     let coverHTML = "";
+
     if(release.audio_path) {
+
       const {data} = await db.storage
         .from("releases-audio")
         .createSignedUrl(release.audio_path,3600);
+
       if(data?.signedUrl) {
-        audioHTML = '<audio controls src="'+escapeHTML(data.signedUrl)+'"></audio>';
+        audioHTML =
+          '<audio controls src="'+escapeHTML(data.signedUrl)+'"></audio>';
       }
     }
+
     if(release.cover_path) {
+
       const {data} = await db.storage
         .from("releases-covers")
         .createSignedUrl(release.cover_path,3600);
+
       if(data?.signedUrl) {
-        coverHTML = '<img class="cover" src="'+escapeHTML(data.signedUrl)+'" alt="Pochette">';
+        coverHTML =
+          '<img class="cover" src="'+escapeHTML(data.signedUrl)+'" alt="Pochette">';
       }
     }
+
     const card = document.createElement("div");
+
     card.className = "release";
+
     card.innerHTML = `
       <h3>${escapeHTML(release.title)}</h3>
       <p><strong>Artiste :</strong> ${escapeHTML(artist)}</p>
@@ -258,6 +483,7 @@ async function loadReleases() {
       <p><strong>Statut :</strong> <span class="status">${escapeHTML(release.status)}</span></p>
       ${coverHTML}
       ${audioHTML}
+
       <div class="actions">
         <select aria-label="Nouveau statut">
           <option value="pending">En attente</option>
@@ -265,56 +491,89 @@ async function loadReleases() {
           <option value="rejected">Refusé</option>
           <option value="distributed">Distribué</option>
         </select>
+
         <button type="button">Enregistrer le statut</button>
       </div>
     `;
+
     const select = card.querySelector("select");
     const saveButton = card.querySelector("button");
+
     select.value = release.status || "pending";
+
     saveButton.addEventListener("click", async () => {
+
       saveButton.disabled = true;
       saveButton.textContent = "Enregistrement...";
+
       const {error:updateError} = await db
         .from("releases")
         .update({status:select.value})
         .eq("id",release.id);
+
       if(updateError) {
+
         showMessage("Erreur : " + updateError.message, "error");
+
       } else {
+
         showMessage("Statut du projet mis à jour !");
         card.querySelector(".status").textContent = select.value;
+
       }
+
       saveButton.disabled = false;
       saveButton.textContent = "Enregistrer le statut";
+
     });
+
     releasesDiv.appendChild(card);
+
   }
 }
-/* GESTION MARKETPLACE */
+
+
+/* =================================
+   GESTION MARKETPLACE
+================================= */
+
 async function loadMarketplace() {
+
   showMessage("Chargement des données de la marketplace...");
+
   const [sellersResult, salesResult] = await Promise.all([
+
     db.from("public_seller_profiles")
       .select("id,shop_name,whatsapp,physical_address"),
+
     db.from("seller_sales")
       .select("*")
       .order("created_at",{ascending:false})
+
   ]);
+
   if(sellersResult.error) {
     showMessage("Erreur vendeurs : " + sellersResult.error.message, "error");
     return;
   }
+
   if(salesResult.error) {
     showMessage("Erreur ventes : " + salesResult.error.message, "error");
     return;
   }
+
   const sellers = sellersResult.data || [];
   const sales = salesResult.data || [];
+
   const sellerMap = {};
+
   sellers.forEach(s => sellerMap[s.id] = s);
+
   document.getElementById("sellerCount").textContent = sellers.length;
   document.getElementById("salesCount").textContent = sales.length;
+
   document.getElementById("sellersTable").innerHTML = sellers.length
+
     ? sellers.map(s => `
       <tr>
         <td>${escapeHTML(s.shop_name || "Sans nom")}</td>
@@ -322,23 +581,37 @@ async function loadMarketplace() {
         <td>${escapeHTML(s.physical_address || "Non renseignée")}</td>
       </tr>
     `).join("")
+
     : '<tr><td colspan="3">Aucun vendeur inscrit.</td></tr>';
-  const revenue = sales.reduce((sum,s) => sum + Number(s.sale_amount || 0),0);
-  const commission = sales.reduce((sum,s) => sum + Number(s.commission || 0),0);
+
+  const revenue = sales.reduce(
+    (sum,s) => sum + Number(s.sale_amount || 0),0
+  );
+
+  const commission = sales.reduce(
+    (sum,s) => sum + Number(s.commission || 0),0
+  );
+
   const paid = sales
     .filter(s => s.payment_status === "paid")
     .reduce((sum,s) => sum + Number(s.commission || 0),0);
+
   const unpaid = sales
     .filter(s => s.payment_status === "unpaid")
     .reduce((sum,s) => sum + Number(s.commission || 0),0);
+
   document.getElementById("totalRevenue").textContent = money(revenue);
   document.getElementById("totalCommission").textContent = money(commission);
   document.getElementById("paidCommission").textContent = money(paid);
   document.getElementById("unpaidCommission").textContent = money(unpaid);
+
   document.getElementById("salesTable").innerHTML = sales.length
+
     ? sales.map(s => {
+
       const seller = sellerMap[s.seller_id] || {};
       const isPaid = s.payment_status === "paid";
+
       return `
         <tr>
           <td>${escapeHTML(seller.shop_name || "Vendeur")}</td>
@@ -348,34 +621,58 @@ async function loadMarketplace() {
           <td>${money(s.commission)}</td>
           <td>${money(s.seller_amount)}</td>
           <td>${escapeHTML(s.sale_date)}</td>
-          <td class="${isPaid ? "paid" : "unpaid"}">${isPaid ? "Payée" : "Impayée"}</td>
+          <td class="${isPaid ? "paid" : "unpaid"}">
+            ${isPaid ? "Payée" : "Impayée"}
+          </td>
           <td>
-            ${isPaid ? "—" : `<button class="pay-button" onclick="markAsPaid('${s.id}')">Marquer payée</button>`}
+            ${isPaid
+              ? "—"
+              : `<button class="pay-button" onclick="markAsPaid('${s.id}')">Marquer payée</button>`
+            }
           </td>
         </tr>
       `;
+
     }).join("")
+
     : '<tr><td colspan="9">Aucune vente déclarée.</td></tr>';
+
   showMessage("Données de la marketplace actualisées.");
+
 }
+
+
 async function markAsPaid(saleId) {
+
   const confirmed = confirm(
     "Confirmer que Moonlight Digital a réellement reçu cette commission ?"
   );
+
   if(!confirmed) return;
+
   const {error} = await db
     .from("seller_sales")
     .update({payment_status:"paid"})
     .eq("id",saleId)
     .eq("payment_status","unpaid");
+
   if(error) {
+
     showMessage("Erreur : " + error.message, "error");
     return;
+
   }
+
   showMessage("Commission marquée comme payée.");
+
   await loadMarketplace();
+
 }
+
+
 initialize();
+
 </script>
+
 </body>
 </html>
