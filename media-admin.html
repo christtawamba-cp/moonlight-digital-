@@ -1,1 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050505">
+  <meta name="description" content="Espace d'administration de Moonlight Media.">
+  <title>Administration | Moonlight Media</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+    body{background:#050505;color:#fff;line-height:1.5;padding:24px 14px}
+    .wrap{max-width:850px;margin:auto}
+    header{padding:18px 0 24px;border-bottom:1px solid #292929;margin-bottom:24px}
+    h1{color:#d4af37;font-size:27px}
+    header p,.muted{color:#aaa;font-size:14px}
+    .panel{background:#101010;border:1px solid #292929;border-radius:16px;padding:22px;margin:18px 0}
+    h2{font-size:20px;color:#d4af37;margin-bottom:15px}
+    label{display:block;margin:13px 0 6px;color:#ddd;font-size:14px}
+    input,textarea,select{width:100%;padding:12px;border:1px solid #383838;border-radius:9px;background:#080808;color:#fff;font-size:15px}
+    textarea{min-height:130px;resize:vertical}
+    button,.btn{border:0;border-radius:25px;padding:12px 19px;font-weight:bold;cursor:pointer;text-decoration:none;display:inline-block}
+    .primary{background:#d4af37;color:#050505}
+    .secondary{background:#292929;color:#fff}
+    .danger{background:#702525;color:#fff}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+    .hidden{display:none!important}
+    .status{margin-top:12px;font-size:14px;white-space:pre-wrap}
+    .post{border-top:1px solid #292929;padding:17px 0}
+    .post:first-child{border-top:0}
+    .post h3{color:#fff;margin-bottom:7px}
+    .post p{color:#bbb;white-space:pre-wrap;overflow-wrap:anywhere}
+    .post img,.post video{display:block;width:100%;max-height:420px;object-fit:contain;background:#000;border-radius:10px;margin-top:12px}
+    .meta{font-size:12px;color:#888;margin:8px 0}
+    a{color:#d4af37}
+    @media(max-width:550px){body{padding:16px 10px}.panel{padding:17px}h1{font-size:23px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🌙 MOONLIGHT MEDIA</h1>
+    <p>Espace d'administration — publication et gestion des contenus</p>
+    <div class="row"><a class="btn secondary" href="media.html">Voir le média public</a><a class="btn secondary" href="index.html">Retour au site</a></div>
+  </header>
 
+  <section class="panel" id="loginPanel">
+    <h2>Connexion administrateur</h2>
+    <p class="muted">Connecte-toi avec l'adresse e-mail et le mot de passe du compte Supabase que tu as choisi comme administrateur.</p>
+    <form id="loginForm">
+      <label for="email">Adresse e-mail</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="password">Mot de passe</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <div class="row"><button class="primary" type="submit">Se connecter</button></div>
+    </form>
+    <p class="status" id="loginStatus" role="status"></p>
+  </section>
+
+  <div id="adminArea" class="hidden">
+    <div class="panel">
+      <h2>Créer une publication</h2>
+      <form id="postForm">
+        <label for="title">Titre (facultatif)</label>
+        <input id="title" maxlength="160" placeholder="Titre de votre publication">
+        <label for="content">Texte</label>
+        <textarea id="content" placeholder="Que souhaitez-vous partager ?"></textarea>
+        <label for="mediaFile">Ajouter une photo ou une vidéo (facultatif)</label>
+        <input id="mediaFile" type="file" accept="image/*,video/*">
+        <p class="muted">Formats image et vidéo pris en charge par ton navigateur. Taille maximale conseillée : 50 Mo.</p>
+        <div class="row"><button class="primary" id="publishBtn" type="submit">Publier</button><button class="secondary" type="reset">Effacer</button></div>
+      </form>
+      <p class="status" id="publishStatus" role="status"></p>
+    </div>
+
+    <div class="panel">
+      <div class="row" style="justify-content:space-between;align-items:center;margin-top:0">
+        <h2 style="margin:0">Tes publications</h2>
+        <button class="secondary" id="refreshBtn" type="button">Actualiser</button>
+      </div>
+      <div id="postsList" style="margin-top:15px"><p class="muted">Chargement…</p></div>
+    </div>
+    <div class="row"><button class="danger" id="logoutBtn" type="button">Se déconnecter</button></div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const $ = (id) => document.getElementById(id);
+
+  function showStatus(id, message, isError=false) {
+    $(id).textContent = message;
+    $(id).style.color = isError ? "#ff8b8b" : "#9bd6a5";
+  }
+
+  async function checkAdmin() {
+    const { data: { user }, error: userError } = await client.auth.getUser();
+    if (userError || !user) {
+      $("loginPanel").classList.remove("hidden");
+      $("adminArea").classList.add("hidden");
+      return;
+    }
+    const { data: isAdmin, error } = await client.rpc("is_media_admin");
+
+    if (error || isAdmin !== true) {
+      $("loginPanel").classList.remove("hidden");
+      $("adminArea").classList.add("hidden");
+      showStatus("loginStatus", error ? "Vérification impossible : " + error.message : "Ce compte n'a pas les droits administrateur.", true);
+      return;
+    }
+    $("loginPanel").classList.add("hidden");
+    $("adminArea").classList.remove("hidden");
+    await loadPosts();
+  }
+
+  $("loginForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    showStatus("loginStatus", "Connexion en cours…");
+    const { error } = await client.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("password").value
+    });
+    if (error) {
+      showStatus("loginStatus", "Connexion impossible : " + error.message, true);
+      return;
+    }
+    await checkAdmin();
+  });
+
+  $("postForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    $("publishBtn").disabled = true;
+    showStatus("publishStatus", "Publication en cours…");
+
+    try {
+      const { data: { user }, error: authError } = await client.auth.getUser();
+      if (authError || !user) throw new Error("Session expirée. Reconnecte-toi.");
+
+      const title = $("title").value.trim();
+      const content = $("content").value.trim();
+      const file = $("mediaFile").files[0];
+
+      if (!title && !content && !file) throw new Error("Ajoute un texte, un titre ou un média.");
+      if (file && file.size > 50 * 1024 * 1024) throw new Error("Le fichier dépasse 50 Mo. Choisis un fichier plus léger.");
+
+      let mediaUrl = null;
+      let mediaType = "text";
+
+      if (file) {
+        const extension = (file.name.split(".").pop() || "file").toLowerCase().replace(/[^a-z0-9]/g, "");
+        const safeName = crypto.randomUUID() + "." + extension;
+        const path = user.id + "/" + safeName;
+        const { error: uploadError } = await client.storage
+          .from("moonlight-media")
+          .upload(path, file, { upsert: false, contentType: file.type || undefined });
+        if (uploadError) throw uploadError;
+
+        const { data: publicData } = client.storage.from("moonlight-media").getPublicUrl(path);
+        mediaUrl = publicData.publicUrl;
+        mediaType = file.type.startsWith("video/") ? "video" : "image";
+      }
+
+      const { error: insertError } = await client.from("media_posts").insert({
+        title: title || null,
+        content: content || null,
+        media_url: mediaUrl,
+        media_type: mediaType,
+        status: "published",
+        author_id: user.id
+      });
+      if (insertError) throw insertError;
+
+      $("postForm").reset();
+      showStatus("publishStatus", "Publication publiée avec succès !");
+      await loadPosts();
+    } catch (error) {
+      showStatus("publishStatus", "Erreur : " + (error.message || "Une erreur est survenue."), true);
+    } finally {
+      $("publishBtn").disabled = false;
+    }
+  });
+
+  async function loadPosts() {
+    $("postsList").innerHTML = '<p class="muted">Chargement…</p>';
+    const { data, error } = await client
+      .from("media_posts")
+      .select("id,title,content,media_url,media_type,status,created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      $("postsList").textContent = "Impossible de charger les publications : " + error.message;
+      return;
+    }
+    if (!data.length) {
+      $("postsList").innerHTML = '<p class="muted">Aucune publication pour le moment.</p>';
+      return;
+    }
+
+    $("postsList").innerHTML = "";
+    data.forEach((post) => {
+      const article = document.createElement("article");
+      article.className = "post";
+      const heading = document.createElement("h3");
+      heading.textContent = post.title || "Publication sans titre";
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.textContent = new Date(post.created_at).toLocaleString("fr-FR") + " · " + post.status;
+      const body = document.createElement("p");
+      body.textContent = post.content || "";
+      article.append(heading, meta, body);
+
+      if (post.media_url && post.media_type === "image") {
+        const img = document.createElement("img");
+        img.src = post.media_url; img.alt = post.title || "Image publiée";
+        article.appendChild(img);
+      } else if (post.media_url && post.media_type === "video") {
+        const video = document.createElement("video");
+        video.src = post.media_url; video.controls = true; video.preload = "metadata";
+        article.appendChild(video);
+      }
+
+      const actions = document.createElement("div");
+      actions.className = "row";
+      const del = document.createElement("button");
+      del.className = "danger";
+      del.textContent = "Supprimer";
+      del.addEventListener("click", () => deletePost(post.id));
+      actions.appendChild(del);
+      article.appendChild(actions);
+      $("postsList").appendChild(article);
+    });
+  }
+
+  async function deletePost(id) {
+    if (!confirm("Supprimer définitivement cette publication ?")) return;
+    const { error } = await client.from("media_posts").delete().eq("id", id);
+    if (error) {
+      alert("Suppression impossible : " + error.message);
+      return;
+    }
+    await loadPosts();
+  }
+
+  $("refreshBtn").addEventListener("click", loadPosts);
+  $("logoutBtn").addEventListener("click", async () => {
+    await client.auth.signOut();
+    $("adminArea").classList.add("hidden");
+    $("loginPanel").classList.remove("hidden");
+    showStatus("loginStatus", "Tu es déconnecté.");
+  });
+
+  client.auth.onAuthStateChange(() => {
+    setTimeout(checkAdmin, 0);
+  });
+  checkAdmin();
+</script>
+</body>
+</html>
