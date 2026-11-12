@@ -86,8 +86,10 @@
       font-size: 14px;
     }
 
+    /* BOUTONS DE NAVIGATION */
     .artist-access,
-    .marketplace-access {
+    .marketplace-access,
+    .media-access {
       display: inline-block;
       margin: 18px 5px 0;
       padding: 11px 23px;
@@ -108,8 +110,15 @@
       color: #050505;
     }
 
+    .media-access {
+      background: #171717;
+      color: #d4af37;
+      border: 1px solid #d4af37;
+    }
+
     .artist-access:hover,
-    .marketplace-access:hover {
+    .marketplace-access:hover,
+    .media-access:hover {
       background: #d4af37;
       transform: scale(1.05);
     }
@@ -302,6 +311,14 @@
       .service-detail {
         padding: 25px 20px;
       }
+
+      .artist-access,
+      .marketplace-access,
+      .media-access {
+        margin: 12px 3px 0;
+        padding: 10px 15px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
@@ -319,6 +336,10 @@
 
   <a href="marketplace.html" class="marketplace-access">
     🛍️ MARKETPLACE
+  </a>
+
+  <a href="media.html" class="media-access">
+    📰 MOONLIGHT MEDIA
   </a>
 </header>
 
