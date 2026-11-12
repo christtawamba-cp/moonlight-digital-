@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080808">
+  <title>Moonlight Media | Communauté</title>
+  <style>
+    :root{--gold:#d6ad55;--bg:#080808;--panel:#141414;--muted:#aaa;--line:#292929}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:#fff;font-family:Arial,Helvetica,sans-serif}
+    header{position:sticky;top:0;z-index:5;background:#090909eF;border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+    .top{max-width:900px;margin:auto;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{font-weight:800;letter-spacing:.5px;color:var(--gold);font-size:20px}
+    .brand small{display:block;color:#eee;font-size:10px;letter-spacing:3px;margin-top:3px}
+    a{color:inherit;text-decoration:none}
+    button{border:0;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer}
+    .gold{background:var(--gold);color:#111}
+    .outline{background:transparent;border:1px solid #555;color:#fff}
+    main{max-width:760px;margin:25px auto;padding:0 14px 50px}
+    .intro{padding:22px 18px;border:1px solid #3a3020;border-radius:16px;background:linear-gradient(135deg,#1c180f,#111);margin-bottom:18px}
+    .intro h1{margin:0 0 8px;font-size:26px}.intro p{margin:0;color:#ccc;line-height:1.5}
+    .auth,.post{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+    .auth h2{font-size:18px;margin:0 0 12px}
+    .auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    input,textarea{width:100%;background:#090909;color:white;border:1px solid #383838;border-radius:8px;padding:11px;font:inherit}
+    .auth-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .hint,.muted{color:var(--muted);font-size:13px;line-height:1.5}
+    .status{font-size:13px;color:var(--gold);margin-top:10px;min-height:18px}
+    .post-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .author{font-weight:700}.date{font-size:12px;color:var(--muted);margin-top:4px}
+    .post h3{margin:0 0 8px;font-size:19px}.post-text{white-space:pre-wrap;line-height:1.55;color:#eee}
+    .post-media{display:block;width:100%;max-height:560px;object-fit:contain;background:#050505;border-radius:10px;margin-top:13px}
+    .post-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+    .post-actions button{background:#202020;color:#eee;border:1px solid #383838}
+    .post-actions button.liked{color:var(--gold);border-color:var(--gold)}
+    .comments{margin-top:14px}.comments h4{margin:0 0 9px;font-size:14px}
+    .comment{padding:9px 10px;background:#0c0c0c;border-radius:8px;margin:7px 0;font-size:14px;line-height:1.45}
+    .comment strong{color:var(--gold);font-size:12px;display:block;margin-bottom:3px}
+    .comment-form{display:flex;gap:8px;margin-top:10px}.comment-form input{flex:1;min-width:0}
+    .empty,.loading{text-align:center;color:var(--muted);padding:25px 12px}
+    footer{text-align:center;color:#777;font-size:12px;padding:20px}
+    @media(max-width:560px){.auth-grid{grid-template-columns:1fr}.top{padding:12px}.brand{font-size:17px}.intro h1{font-size:22px}.comment-form{flex-direction:column}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <a class="brand" href="index.html">MOONLIGHT DIGITAL<small>MOONLIGHT MEDIA</small></a>
+    <button id="authToggle" class="outline" type="button">Connexion</button>
+  </div>
+</header>
+
+<main>
+  <section class="intro">
+    <h1>Bienvenue sur Moonlight Media</h1>
+    <p>Votre espace d’actualité, de partage et de découverte. Retrouvez les publications de notre communauté.</p>
+  </section>
+
+  <section class="auth" id="authPanel">
+    <h2 id="authTitle">Rejoindre la communauté</h2>
+    <div class="auth-grid">
+      <input id="email" type="email" placeholder="Adresse e-mail" autocomplete="email">
+      <input id="password" type="password" placeholder="Mot de passe" autocomplete="current-password">
+    </div>
+    <div class="auth-actions">
+      <button class="gold" id="loginBtn" type="button">Se connecter</button>
+      <button class="outline" id="signupBtn" type="button">Créer un compte</button>
+      <button class="outline" id="logoutBtn" type="button" hidden>Se déconnecter</button>
+    </div>
+    <div class="hint">La lecture des publications est ouverte à tous. Pour aimer ou commenter, connectez-vous ou créez un compte.</div>
+    <div class="status" id="authStatus" role="status"></div>
+  </section>
+
+  <section id="feed" aria-live="polite"><div class="loading">Chargement des publications…</div></section>
+</main>
+<footer>© <span id="year"></span> Moonlight Digital — Moonlight Media</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(() => {
+  const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  let currentUser = null;
+  const feed = document.getElementById("feed");
+  const authStatus = document.getElementById("authStatus");
+  const authPanel = document.getElementById("authPanel");
+  const authToggle = document.getElementById("authToggle");
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  function say(message, isError=false) {
+    authStatus.textContent = message;
+    authStatus.style.color = isError ? "#ff8d8d" : "var(--gold)";
+  }
+  function escapeHtml(value="") {
+    return String(value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+  function dateLabel(value) {
+    return new Date(value).toLocaleString("fr-FR",{dateStyle:"medium",timeStyle:"short"});
+  }
+  function updateAuthUI() {
+    document.getElementById("loginBtn").hidden = !!currentUser;
+    document.getElementById("signupBtn").hidden = !!currentUser;
+    document.getElementById("logoutBtn").hidden = !currentUser;
+    authToggle.textContent = currentUser ? "Mon compte" : "Connexion";
+    document.getElementById("authTitle").textContent = currentUser ? "Vous êtes connecté" : "Rejoindre la communauté";
+    if(currentUser) say("Connecté. Vous pouvez maintenant aimer et commenter les publications.");
+  }
+
+  async function loadFeed() {
+    feed.innerHTML = '<div class="loading">Chargement des publications…</div>';
+    const {data: posts, error} = await db.from("media_posts")
+      .select("id,title,content,media_url,media_type,created_at")
+      .eq("status","published").order("created_at",{ascending:false});
+    if(error) {
+      feed.innerHTML = '<div class="empty">Impossible de charger les publications. Vérifiez la configuration Supabase et les règles d’accès.</div>';
+      console.error(error); return;
+    }
+    if(!posts || !posts.length) {
+      feed.innerHTML = '<div class="empty">Aucune publication pour le moment. Revenez bientôt !</div>'; return;
+    }
+    const ids = posts.map(p=>p.id);
+    const [{data: likes, error: likesError},{data: comments, error: commentsError}] = await Promise.all([
+      db.from("media_likes").select("post_id,user_id").in("post_id",ids),
+      db.from("media_comments").select("id,post_id,user_id,content,created_at").in("post_id",ids).order("created_at",{ascending:true})
+    ]);
+    if(likesError) console.warn("Likes:",likesError);
+    if(commentsError) console.warn("Commentaires:",commentsError);
+    const safeLikes = likes || [], safeComments = comments || [];
+    feed.innerHTML = posts.map(post => {
+      const postLikes = safeLikes.filter(l=>l.post_id===post.id);
+      const liked = currentUser && postLikes.some(l=>l.user_id===currentUser.id);
+      const postComments = safeComments.filter(c=>c.post_id===post.id);
+      let media = "";
+      if(post.media_url) {
+        if(post.media_type === "video") media = `<video class="post-media" controls playsinline preload="metadata" src="${escapeHtml(post.media_url)}"></video>`;
+        else media = `<img class="post-media" loading="lazy" src="${escapeHtml(post.media_url)}" alt="Média de la publication">`;
+      }
+      return `<article class="post" data-post="${escapeHtml(post.id)}">
+        <div class="post-head"><div><div class="author">Moonlight Media</div><div class="date">${dateLabel(post.created_at)}</div></div></div>
+        ${post.title ? `<h3>${escapeHtml(post.title)}</h3>` : ""}
+        ${post.content ? `<div class="post-text">${escapeHtml(post.content)}</div>` : ""}
+        ${media}
+        <div class="post-actions">
+          <button type="button" class="like-btn ${liked?"liked":""}" data-id="${escapeHtml(post.id)}">♥ J’aime (${postLikes.length})</button>
+          <button type="button" class="comment-focus" data-id="${escapeHtml(post.id)}">💬 Commenter (${postComments.length})</button>
+          <button type="button" class="share-btn" data-id="${escapeHtml(post.id)}">↗ Partager</button>
+        </div>
+        <div class="comments"><h4>Commentaires</h4>
+          <div>${postComments.map(c=>`<div class="comment"><strong>Membre · ${dateLabel(c.created_at)}</strong>${escapeHtml(c.content)}</div>`).join("") || '<div class="muted">Aucun commentaire pour le moment.</div>'}</div>
+          <form class="comment-form" data-id="${escapeHtml(post.id)}">
+            <input name="comment" maxlength="1000" placeholder="${currentUser?"Écrire un commentaire…":"Connectez-vous pour commenter"}" ${currentUser?"":"disabled"}>
+            <button class="gold" type="submit" ${currentUser?"":"disabled"}>Envoyer</button>
+          </form>
+        </div>
+      </article>`;
+    }).join("");
+  }
+
+  document.getElementById("loginBtn").addEventListener("click", async () => {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    if(!email || !password) return say("Saisissez votre e-mail et votre mot de passe.",true);
+    const {error} = await db.auth.signInWithPassword({email,password});
+    if(error) return say(error.message,true);
+    say("Connexion réussie."); 
+  });
+  document.getElementById("signupBtn").addEventListener("click", async () => {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    if(!email || password.length < 6) return say("Saisissez un e-mail valide et un mot de passe d’au moins 6 caractères.",true);
+    const {data,error} = await db.auth.signUp({email,password});
+    if(error) return say(error.message,true);
+    if(data.session) say("Compte créé et connecté.");
+    else say("Compte créé. Vérifiez votre e-mail pour confirmer l’inscription si la confirmation est activée.");
+  });
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    const {error} = await db.auth.signOut();
+    if(error) say(error.message,true);
+    else say("Vous êtes déconnecté.");
+  });
+  authToggle.addEventListener("click",()=>authPanel.scrollIntoView({behavior:"smooth",block:"center"}));
+
+  feed.addEventListener("click", async event => {
+    const likeButton = event.target.closest(".like-btn");
+    const commentButton = event.target.closest(".comment-focus");
+    const shareButton = event.target.closest(".share-btn");
+    if(likeButton) {
+      if(!currentUser) return say("Connectez-vous pour aimer une publication.",true);
+      const postId = likeButton.dataset.id;
+      const {data: existing,error: findError} = await db.from("media_likes").select("post_id").eq("post_id",postId).eq("user_id",currentUser.id).maybeSingle();
+      if(findError) return say(findError.message,true);
+      const result = existing
+        ? await db.from("media_likes").delete().eq("post_id",postId).eq("user_id",currentUser.id)
+        : await db.from("media_likes").insert({post_id:postId,user_id:currentUser.id});
+      if(result.error) return say(result.error.message,true);
+      await loadFeed();
+    }
+    if(commentButton) {
+      const form = feed.querySelector(`form[data-id="${CSS.escape(commentButton.dataset.id)}"]`);
+      if(form) { form.scrollIntoView({behavior:"smooth",block:"center"}); form.querySelector("input").focus(); }
+    }
+    if(shareButton) {
+      const url = `${location.origin}${location.pathname}#post-${shareButton.dataset.id}`;
+      try {
+        if(navigator.share) await navigator.share({title:"Moonlight Media",text:"Découvre cette publication sur Moonlight Media",url});
+        else { await navigator.clipboard.writeText(url); say("Lien de partage copié."); }
+      } catch(e) {
+        if(e.name!=="AbortError") say("Impossible de partager automatiquement ce lien.",true);
+      }
+    }
+  });
+
+  feed.addEventListener("submit", async event => {
+    const form = event.target.closest(".comment-form");
+    if(!form) return;
+    event.preventDefault();
+    if(!currentUser) return say("Connectez-vous pour commenter.",true);
+    const input = form.querySelector("input[name=comment]");
+    const content = input.value.trim();
+    if(!content) return;
+    const {error} = await db.from("media_comments").insert({post_id:form.dataset.id,user_id:currentUser.id,content});
+    if(error) return say(error.message,true);
+    await loadFeed();
+  });
+
+  db.auth.onAuthStateChange((_event,session) => {
+    currentUser = session?.user || null;
+    updateAuthUI();
+    loadFeed();
+  });
+  db.auth.getSession().then(({data}) => {
+    currentUser = data.session?.user || null;
+    updateAuthUI();
+    loadFeed();
+  });
+})();
+</script>
+</body>
+</html>
