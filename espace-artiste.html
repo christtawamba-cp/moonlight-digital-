@@ -365,11 +365,15 @@ footer {
 
 <script>
 
-/* CONNEXION SUPABASE */
+/* CONFIGURATION SUPABASE */
 
 const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
 
 const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
+
+/* IDENTIFIANT DU COMPTE ADMINISTRATEUR */
+
+const ADMIN_ID = "295c4fb1-6222-4bb5-9278-c55395f7d880";
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
@@ -395,10 +399,47 @@ function showNotice(message) {
 
 function hideNotice() {
   notice.style.display = "none";
-  notice.innerHTML = "";
+  notice.textContent = "";
 }
 
-/* AFFICHER LE BOUTON DU TABLEAU DE BORD */
+/* VERIFICATION DU ROLE ADMIN */
+
+async function redirectIfAdmin(user) {
+
+  if (!user) return false;
+
+  if (user.id === ADMIN_ID) {
+
+    showNotice("Bienvenue dans l'administration Moonlight Digital...");
+
+    window.location.replace("admin.html");
+
+    return true;
+  }
+
+  return false;
+}
+
+/* VERIFIER UNE SESSION DEJA EXISTANTE */
+
+async function checkExistingSession() {
+
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  if (data.session && data.session.user) {
+    await redirectIfAdmin(data.session.user);
+  }
+
+}
+
+checkExistingSession();
+
+/* AFFICHER LE SUCCES ARTISTE */
 
 function showLoginSuccess(artistName) {
 
@@ -406,7 +447,7 @@ function showLoginSuccess(artistName) {
 
   notice.innerHTML = `
     <h3 style="color:#d4af37; margin-bottom:10px;">
-      Bienvenue ${artistName} !
+      Bienvenue !
     </h3>
 
     <p>
@@ -549,6 +590,19 @@ loginForm.addEventListener("submit", async function(e) {
       });
 
     if (error) throw error;
+
+    /* RECONNAITRE LE COMPTE ADMINISTRATEUR */
+
+    if (data.user.id === ADMIN_ID) {
+
+      showNotice("Connexion administrateur réussie. Ouverture du tableau de bord...");
+
+      window.location.replace("admin.html");
+
+      return;
+    }
+
+    /* LES AUTRES COMPTES RESTENT DES COMPTES ARTISTES */
 
     const artistName =
       data.user.user_metadata.artist_name || "Artiste";
