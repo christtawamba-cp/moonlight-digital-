@@ -344,6 +344,8 @@ Cliquez sur « Publier un article » pour ouvrir votre interface de gestion.
 const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
 const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
 
+const ADMIN_ID = "fe4ef189-b4ad-454b-aa06-10ed47028254";
+
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const loading = document.getElementById("loading");
@@ -424,8 +426,6 @@ async function loadDashboardStats() {
 
     countTable("profiles"),
 
-    // La politique RLS actuelle ne donne pas un accès général
-    // aux profils artistes depuis le compte administrateur.
     countTable("artists"),
 
     countTable("releases"),
@@ -468,17 +468,17 @@ async function loadDashboardStats() {
 
   displayCount("statUsers",users);
 
-  // Les politiques RLS actuelles de artists ne permettent pas
-  // à l'administrateur de consulter tous les profils.
-  if(artists.error) {
-    setStat("statArtists","Non disponible",true);
-  } else {
-    setStat("statArtists",artists.value);
-  }
+  // Les politiques RLS actuelles ne garantissent pas
+  // un accès global aux profils artistes.
+  setStat("statArtists","Non disponible",true);
 
   displayCount("statReleases",releases);
   displayCount("statProducts",products);
-  displayCount("statOrders",orders);
+
+  // Les commandes contiennent des données personnelles.
+  // Aucun accès global ne doit être supposé ici.
+  setStat("statOrders","Non disponible",true);
+
   displayCount("statSellers",sellers);
   displayCount("statPosts",posts);
 
@@ -500,10 +500,6 @@ async function loadDashboardStats() {
 
   }
 
-  const unavailable = results.filter(result =>
-    result.error || result.error === null && result.value === null
-  ).length;
-
   document.getElementById("statsMessage").textContent =
     "Dernière actualisation : " +
     new Date().toLocaleString("fr-FR") +
@@ -512,33 +508,64 @@ async function loadDashboardStats() {
 
 
 /* =================================
-   INITIALISATION
+   INITIALISATION ET ACCÈS ADMIN
 ================================= */
 
 async function initialize() {
 
-  const {data:{session},error} = await db.auth.getSession();
+  loading.textContent = "Vérification de votre accès...";
 
-  if(error || !session) {
-    loading.textContent = "Connectez-vous d'abord à votre espace.";
-    return;
-  }
+  try {
 
-  const {data:isAdmin,error:adminError} = await db.rpc("is_admin");
+    const {data,error} = await db.auth.getSession();
 
-  if(adminError || isAdmin !== true) {
+    if(error) {
+      loading.innerHTML =
+        '<p class="error">Erreur de connexion : ' +
+        escapeHTML(error.message) + '</p>';
+      return;
+    }
+
+    const session = data.session;
+
+    if(!session) {
+      loading.innerHTML =
+        '<p class="error">Vous devez vous connecter pour accéder à cette page.</p>' +
+        '<p><a href="espace-artiste.html">Se connecter</a></p>';
+      return;
+    }
+
+    const userId = session.user.id;
+
+    // Vérification de l'identifiant du compte administrateur.
+    if(userId !== ADMIN_ID) {
+
+      loading.innerHTML =
+        '<p class="error">Accès refusé : ce compte n’est pas autorisé à accéder à l’administration.</p>' +
+        '<p>Identifiant du compte connecté :</p>' +
+        '<p><strong>' + escapeHTML(userId) + '</strong></p>' +
+        '<p>Veuillez vous connecter avec le compte administrateur Moonlight Digital.</p>';
+
+      return;
+    }
+
+    // Le compte autorisé est reconnu.
+    loading.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+
+    await Promise.all([
+      loadDashboardStats(),
+      loadReleases()
+    ]);
+
+  } catch(error) {
+
     loading.innerHTML =
-      '<p class="error">Accès refusé. Cette page est réservée aux administrateurs.</p>';
-    return;
+      '<p class="error">Une erreur est survenue : ' +
+      escapeHTML(error.message) + '</p>';
+
   }
 
-  loading.classList.add("hidden");
-  dashboard.classList.remove("hidden");
-
-  await Promise.all([
-    loadDashboardStats(),
-    loadReleases()
-  ]);
 }
 
 
