@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
 <title>Administration | Moonlight Digital</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -10,7 +11,7 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#f3f5f9;color:#202938}
 header{background:#101827;color:white;padding:22px}
-header h1{margin:0;font-size:23px}
+header h1{margin:0;font-size:23px;color:#d4af37}
 header p{color:#cbd5e1}
 main{max-width:1200px;margin:25px auto;padding:15px}
 .panel{background:white;padding:20px;border-radius:12px;margin-bottom:20px}
@@ -32,7 +33,8 @@ audio{width:100%;margin:12px 0}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:20px 0}
 .stat{border:1px solid #e5e7eb;border-radius:10px;padding:16px;background:#fff}
 .stat p{font-size:13px;color:#667085;margin:0 0 10px}
-.stat strong{font-size:23px;color:#1769ff}
+.stat strong{font-size:23px;color:#b68b27;display:block;overflow-wrap:anywhere}
+.stat small{display:block;color:#888;font-size:11px;margin-top:7px}
 .table-wrap{overflow-x:auto;margin-top:15px}
 table{width:100%;border-collapse:collapse;min-width:750px}
 th,td{padding:12px;border-bottom:1px solid #eee;text-align:left;font-size:13px}
@@ -43,14 +45,9 @@ th{background:#f8fafc}
 .message{margin:12px 0}
 .quick-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
 .quick-link{
-display:block;
-padding:18px;
-border:1px solid #e5e7eb;
-border-radius:10px;
-text-decoration:none;
-color:#172b4d;
-background:#fff;
-transition:.2s;
+display:block;padding:18px;border:1px solid #e5e7eb;
+border-radius:10px;text-decoration:none;color:#172b4d;
+background:#fff;transition:.2s
 }
 .quick-link:hover{border-color:#c49a35;transform:translateY(-2px)}
 .quick-link strong{display:block;margin-bottom:7px;font-size:16px}
@@ -58,14 +55,12 @@ transition:.2s;
 .gold{color:#b68b27}
 .media-button{background:#b68b27;color:white}
 .info-box{
-background:#fff8e7;
-border:1px solid #f3dfaa;
-padding:15px;
-border-radius:9px;
-margin-top:15px;
-font-size:14px;
-line-height:1.6;
+background:#fff8e7;border:1px solid #f3dfaa;
+padding:15px;border-radius:9px;margin-top:15px;
+font-size:14px;line-height:1.6
 }
+.stat-unavailable{font-size:15px!important;color:#b45309!important}
+.section-title{margin-top:25px}
 @media(max-width:600px){
 header{padding:18px}
 main{padding:10px}
@@ -111,6 +106,71 @@ Vérification de votre accès...
 <div id="homeSection">
 
 <div class="panel">
+<h2>📊 Vue générale de Moonlight Digital</h2>
+<p>Suivez les principales activités de votre plateforme.</p>
+
+<div class="stats">
+
+<div class="stat">
+<p>Utilisateurs inscrits</p>
+<strong id="statUsers">Chargement...</strong>
+<small>Comptes enregistrés</small>
+</div>
+
+<div class="stat">
+<p>Artistes inscrits</p>
+<strong id="statArtists">Chargement...</strong>
+<small>Profils artistes</small>
+</div>
+
+<div class="stat">
+<p>Projets musicaux</p>
+<strong id="statReleases">Chargement...</strong>
+<small>Sorties reçues</small>
+</div>
+
+<div class="stat">
+<p>Produits actifs</p>
+<strong id="statProducts">Chargement...</strong>
+<small>Produits disponibles</small>
+</div>
+
+<div class="stat">
+<p>Commandes</p>
+<strong id="statOrders">Chargement...</strong>
+<small>Commandes enregistrées</small>
+</div>
+
+<div class="stat">
+<p>Vendeurs</p>
+<strong id="statSellers">Chargement...</strong>
+<small>Boutiques inscrites</small>
+</div>
+
+<div class="stat">
+<p>Publications média</p>
+<strong id="statPosts">Chargement...</strong>
+<small>Publications accessibles</small>
+</div>
+
+<div class="stat">
+<p>Ventes déclarées</p>
+<strong id="statSales">Chargement...</strong>
+<small>Historique des ventes</small>
+</div>
+
+<div class="stat">
+<p>Chiffre d'affaires déclaré</p>
+<strong id="statRevenue">Chargement...</strong>
+<small>Selon les ventes déclarées</small>
+</div>
+
+</div>
+
+<p class="message" id="statsMessage"></p>
+</div>
+
+<div class="panel">
 <h2>🚀 Centre de contrôle</h2>
 <p>Accédez rapidement aux différents services de votre plateforme.</p>
 
@@ -123,7 +183,7 @@ Vérification de votre accès...
 
 <a href="media.html" target="_blank" class="quick-link">
 <strong>🌐 Média public</strong>
-<span>Consulter le fil d'actualité public de Moonlight Digital.</span>
+<span>Consulter le fil d'actualité public.</span>
 </a>
 
 <a href="marketplace.html" target="_blank" class="quick-link">
@@ -152,11 +212,10 @@ suivre les activités de la marketplace et accéder à Moonlight Media.
 </p>
 
 <div class="info-box">
-<strong>Information :</strong><br>
-Les différents services peuvent avoir leurs propres autorisations
-et leurs propres espaces de gestion. Votre accès administrateur
-principal ne remplace pas automatiquement les autorisations
-spécifiques de chaque service.
+<strong>À savoir :</strong><br>
+Les statistiques dépendent des autorisations de votre base de données.
+Une donnée inaccessible sera indiquée comme telle et ne sera pas comptabilisée comme zéro.
+Les ventes déclarées dans seller_sales sont distinctes des commandes enregistrées dans orders.
 </div>
 </div>
 
@@ -164,13 +223,11 @@ spécifiques de chaque service.
 
 <!-- GESTION MUSICALE -->
 <div id="musicSection" class="hidden">
-
 <div class="panel">
 <h2>🎵 Gestion musicale</h2>
 <h3>📁 Projets musicaux reçus</h3>
 <div id="releases">Chargement...</div>
 </div>
-
 </div>
 
 <!-- MARKETPLACE -->
@@ -183,43 +240,35 @@ spécifiques de chaque service.
 <p><strong>Commission de la plateforme : 10 %</strong></p>
 
 <div class="stats">
-
 <div class="stat">
 <p>Vendeurs inscrits</p>
 <strong id="sellerCount">0</strong>
 </div>
-
 <div class="stat">
 <p>Ventes déclarées</p>
 <strong id="salesCount">0</strong>
 </div>
-
 <div class="stat">
 <p>Chiffre d'affaires déclaré</p>
 <strong id="totalRevenue">0 $</strong>
 </div>
-
 <div class="stat">
 <p>Commissions totales</p>
 <strong id="totalCommission">0 $</strong>
 </div>
-
 <div class="stat">
 <p>Commissions payées</p>
 <strong id="paidCommission">0 $</strong>
 </div>
-
 <div class="stat">
 <p>Commissions impayées</p>
 <strong id="unpaidCommission">0 $</strong>
 </div>
-
 </div>
 </div>
 
 <div class="panel">
 <h3>👥 Vendeurs inscrits</h3>
-
 <div class="table-wrap">
 <table>
 <thead>
@@ -238,7 +287,6 @@ spécifiques de chaque service.
 
 <div class="panel">
 <h3>💰 Historique des ventes et commissions</h3>
-
 <div class="table-wrap">
 <table>
 <thead>
@@ -265,17 +313,11 @@ spécifiques de chaque service.
 
 <!-- MOONLIGHT MEDIA -->
 <div id="mediaSection" class="hidden">
-
 <div class="panel">
 <h2>📰 Administration Moonlight Media</h2>
-
-<p>
-Gérez les publications et les actualités de votre média
-depuis cet espace.
-</p>
+<p>Gérez les publications et les actualités de votre média depuis cet espace.</p>
 
 <div class="quick-links">
-
 <a href="media-admin.html" class="quick-link">
 <strong>✍️ Publier un article</strong>
 <span>Accéder à l'espace de publication et ajouter du contenu.</span>
@@ -285,18 +327,14 @@ depuis cet espace.
 <strong>🌐 Voir les publications</strong>
 <span>Consulter les publications visibles par le public.</span>
 </a>
-
 </div>
 
 <div class="info-box">
 <strong>Gestion des publications :</strong><br>
 L'espace Moonlight Media possède son propre contrôle d'accès.
-Cliquez sur « Publier un article » pour ouvrir votre interface
-de gestion des publications.
+Cliquez sur « Publier un article » pour ouvrir votre interface de gestion.
 </div>
-
 </div>
-
 </div>
 
 </section>
@@ -336,6 +374,147 @@ function showMessage(text, type = "success") {
   message.textContent = text;
 }
 
+function setStat(id, value, unavailable = false) {
+  const element = document.getElementById(id);
+  element.textContent = value;
+
+  if(unavailable) {
+    element.classList.add("stat-unavailable");
+  } else {
+    element.classList.remove("stat-unavailable");
+  }
+}
+
+async function countTable(table, column = "id", filters = []) {
+  let query = db.from(table).select(column, {
+    count:"exact",
+    head:true
+  });
+
+  filters.forEach(filter => {
+    query = query.eq(filter.column, filter.value);
+  });
+
+  const {count,error} = await query;
+
+  if(error) {
+    return {value:null,error:error.message};
+  }
+
+  return {value:count ?? 0,error:null};
+}
+
+async function loadDashboardStats() {
+
+  const ids = [
+    "statUsers",
+    "statArtists",
+    "statReleases",
+    "statProducts",
+    "statOrders",
+    "statSellers",
+    "statPosts",
+    "statSales",
+    "statRevenue"
+  ];
+
+  ids.forEach(id => setStat(id,"Chargement..."));
+
+  const results = await Promise.all([
+
+    countTable("profiles"),
+
+    // La politique RLS actuelle ne donne pas un accès général
+    // aux profils artistes depuis le compte administrateur.
+    countTable("artists"),
+
+    countTable("releases"),
+
+    countTable("products","id",[
+      {column:"status",value:"active"}
+    ]),
+
+    countTable("orders"),
+
+    countTable("public_seller_profiles"),
+
+    countTable("media_posts","id",[
+      {column:"status",value:"published"}
+    ]),
+
+    db.from("seller_sales")
+      .select("sale_amount,commission,payment_status")
+
+  ]);
+
+  const [
+    users,
+    artists,
+    releases,
+    products,
+    orders,
+    sellers,
+    posts,
+    salesResult
+  ] = results;
+
+  function displayCount(id,result) {
+    if(result.error) {
+      setStat(id,"Non disponible",true);
+    } else {
+      setStat(id,result.value);
+    }
+  }
+
+  displayCount("statUsers",users);
+
+  // Les politiques RLS actuelles de artists ne permettent pas
+  // à l'administrateur de consulter tous les profils.
+  if(artists.error) {
+    setStat("statArtists","Non disponible",true);
+  } else {
+    setStat("statArtists",artists.value);
+  }
+
+  displayCount("statReleases",releases);
+  displayCount("statProducts",products);
+  displayCount("statOrders",orders);
+  displayCount("statSellers",sellers);
+  displayCount("statPosts",posts);
+
+  if(salesResult.error) {
+
+    setStat("statSales","Non disponible",true);
+    setStat("statRevenue","Non disponible",true);
+
+  } else {
+
+    const sales = salesResult.data || [];
+
+    const revenue = sales.reduce(
+      (sum,s) => sum + Number(s.sale_amount || 0),0
+    );
+
+    setStat("statSales",sales.length);
+    setStat("statRevenue",money(revenue));
+
+  }
+
+  const unavailable = results.filter(result =>
+    result.error || result.error === null && result.value === null
+  ).length;
+
+  document.getElementById("statsMessage").textContent =
+    "Dernière actualisation : " +
+    new Date().toLocaleString("fr-FR") +
+    ". Les statistiques indisponibles nécessitent une vérification des autorisations Supabase.";
+}
+
+
+/* =================================
+   INITIALISATION
+================================= */
+
 async function initialize() {
 
   const {data:{session},error} = await db.auth.getSession();
@@ -356,41 +535,56 @@ async function initialize() {
   loading.classList.add("hidden");
   dashboard.classList.remove("hidden");
 
-  await loadReleases();
+  await Promise.all([
+    loadDashboardStats(),
+    loadReleases()
+  ]);
 }
+
+
+/* =================================
+   NAVIGATION
+================================= */
 
 function showSection(section) {
 
   currentSection = section;
 
-  document.getElementById("homeSection").classList.toggle("hidden", section !== "home");
-  document.getElementById("musicSection").classList.toggle("hidden", section !== "music");
-  document.getElementById("marketSection").classList.toggle("hidden", section !== "market");
-  document.getElementById("mediaSection").classList.toggle("hidden", section !== "media");
+  document.getElementById("homeSection").classList.toggle("hidden",section !== "home");
+  document.getElementById("musicSection").classList.toggle("hidden",section !== "music");
+  document.getElementById("marketSection").classList.toggle("hidden",section !== "market");
+  document.getElementById("mediaSection").classList.toggle("hidden",section !== "media");
 
-  document.getElementById("homeTab").classList.toggle("active", section === "home");
-  document.getElementById("musicTab").classList.toggle("active", section === "music");
-  document.getElementById("marketTab").classList.toggle("active", section === "market");
-  document.getElementById("mediaTab").classList.toggle("active", section === "media");
+  document.getElementById("homeTab").classList.toggle("active",section === "home");
+  document.getElementById("musicTab").classList.toggle("active",section === "music");
+  document.getElementById("marketTab").classList.toggle("active",section === "market");
+  document.getElementById("mediaTab").classList.toggle("active",section === "media");
 
+  if(section === "home") loadDashboardStats();
   if(section === "market") loadMarketplace();
   if(section === "music") loadReleases();
 }
 
-document.getElementById("homeTab").addEventListener("click", () => showSection("home"));
-document.getElementById("musicTab").addEventListener("click", () => showSection("music"));
-document.getElementById("marketTab").addEventListener("click", () => showSection("market"));
-document.getElementById("mediaTab").addEventListener("click", () => showSection("media"));
+document.getElementById("homeTab").addEventListener("click",() => showSection("home"));
+document.getElementById("musicTab").addEventListener("click",() => showSection("music"));
+document.getElementById("marketTab").addEventListener("click",() => showSection("market"));
+document.getElementById("mediaTab").addEventListener("click",() => showSection("media"));
 
-document.getElementById("refresh").addEventListener("click", () => {
+document.getElementById("refresh").addEventListener("click",async () => {
 
-  if(currentSection === "music") loadReleases();
-  else if(currentSection === "market") loadMarketplace();
-  else showMessage("Votre espace d'administration est actualisé.");
+  if(currentSection === "music") {
+    await loadReleases();
+  } else if(currentSection === "market") {
+    await loadMarketplace();
+  } else {
+    await loadDashboardStats();
+  }
+
+  showMessage("Actualisation terminée.");
 
 });
 
-document.getElementById("logout").addEventListener("click", async () => {
+document.getElementById("logout").addEventListener("click",async () => {
 
   await db.auth.signOut();
   window.location.href = "espace-artiste.html";
@@ -472,7 +666,6 @@ async function loadReleases() {
     }
 
     const card = document.createElement("div");
-
     card.className = "release";
 
     card.innerHTML = `
@@ -483,7 +676,6 @@ async function loadReleases() {
       <p><strong>Statut :</strong> <span class="status">${escapeHTML(release.status)}</span></p>
       ${coverHTML}
       ${audioHTML}
-
       <div class="actions">
         <select aria-label="Nouveau statut">
           <option value="pending">En attente</option>
@@ -491,7 +683,6 @@ async function loadReleases() {
           <option value="rejected">Refusé</option>
           <option value="distributed">Distribué</option>
         </select>
-
         <button type="button">Enregistrer le statut</button>
       </div>
     `;
@@ -501,7 +692,7 @@ async function loadReleases() {
 
     select.value = release.status || "pending";
 
-    saveButton.addEventListener("click", async () => {
+    saveButton.addEventListener("click",async () => {
 
       saveButton.disabled = true;
       saveButton.textContent = "Enregistrement...";
@@ -513,7 +704,7 @@ async function loadReleases() {
 
       if(updateError) {
 
-        showMessage("Erreur : " + updateError.message, "error");
+        showMessage("Erreur : " + updateError.message,"error");
 
       } else {
 
@@ -541,7 +732,7 @@ async function loadMarketplace() {
 
   showMessage("Chargement des données de la marketplace...");
 
-  const [sellersResult, salesResult] = await Promise.all([
+  const [sellersResult,salesResult] = await Promise.all([
 
     db.from("public_seller_profiles")
       .select("id,shop_name,whatsapp,physical_address"),
@@ -553,12 +744,12 @@ async function loadMarketplace() {
   ]);
 
   if(sellersResult.error) {
-    showMessage("Erreur vendeurs : " + sellersResult.error.message, "error");
+    showMessage("Erreur vendeurs : " + sellersResult.error.message,"error");
     return;
   }
 
   if(salesResult.error) {
-    showMessage("Erreur ventes : " + salesResult.error.message, "error");
+    showMessage("Erreur ventes : " + salesResult.error.message,"error");
     return;
   }
 
@@ -658,7 +849,7 @@ async function markAsPaid(saleId) {
 
   if(error) {
 
-    showMessage("Erreur : " + error.message, "error");
+    showMessage("Erreur : " + error.message,"error");
     return;
 
   }
