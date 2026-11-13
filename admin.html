@@ -18,7 +18,7 @@ main{max-width:1200px;margin:25px auto;padding:15px}
 input,button,select{padding:12px;border-radius:7px;border:1px solid #ddd}
 button{background:#172b4d;color:white;border:0;cursor:pointer}
 button:disabled{opacity:.6;cursor:not-allowed}
-.release{border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin:15px 0}
+.release,.item-card{border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin:15px 0;background:white}
 .cover{width:110px;height:110px;object-fit:cover;border-radius:8px}
 audio{width:100%;margin:12px 0}
 .status{font-weight:bold}
@@ -61,11 +61,24 @@ font-size:14px;line-height:1.6
 }
 .stat-unavailable{font-size:15px!important;color:#b45309!important}
 .section-title{margin-top:25px}
+.danger-button{background:#b91c1c;color:white;padding:9px 12px}
+.danger-button:hover{background:#991b1b}
+.small-button{padding:8px 10px}
+.item-card h3{margin-top:0;color:#172b4d}
+.item-card p{font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.item-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.search-input{width:100%;margin:10px 0 15px}
+.management-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+.management-tabs button{background:#e5e7eb;color:#172b4d}
+.management-tabs button.active{background:#172b4d;color:white}
+.badge{display:inline-block;padding:5px 9px;border-radius:20px;background:#eef2ff;color:#3730a3;font-size:12px}
+.empty-state{padding:20px;text-align:center;color:#667085}
 @media(max-width:600px){
 header{padding:18px}
 main{padding:10px}
 .panel{padding:15px}
 .tabs button{flex:1}
+.management-tabs button{flex:1}
 }
 </style>
 </head>
@@ -93,6 +106,7 @@ Vérification de votre accès...
 <button class="active" id="homeTab">🏠 Accueil</button>
 <button id="musicTab">🎵 Musique</button>
 <button id="marketTab">🛍️ Marketplace</button>
+<button id="manageTab">⚙️ Gestion générale</button>
 <button id="mediaTab">📰 Media</button>
 </div>
 
@@ -114,7 +128,7 @@ Vérification de votre accès...
 <div class="stat">
 <p>Utilisateurs inscrits</p>
 <strong id="statUsers">Chargement...</strong>
-<small>Comptes enregistrés</small>
+<small>Profils enregistrés</small>
 </div>
 
 <div class="stat">
@@ -214,7 +228,6 @@ suivre les activités de la marketplace et accéder à Moonlight Media.
 <div class="info-box">
 <strong>À savoir :</strong><br>
 Les statistiques dépendent des autorisations de votre base de données.
-Une donnée inaccessible sera indiquée comme telle et ne sera pas comptabilisée comme zéro.
 Les ventes déclarées dans seller_sales sont distinctes des commandes enregistrées dans orders.
 </div>
 </div>
@@ -311,6 +324,60 @@ Les ventes déclarées dans seller_sales sont distinctes des commandes enregistr
 
 </div>
 
+<!-- GESTION GENERALE -->
+<div id="manageSection" class="hidden">
+
+<div class="panel">
+<h2>⚙️ Gestion générale</h2>
+<p>Gérez les données de votre plateforme depuis cet espace.</p>
+
+<div class="info-box">
+<strong>Attention :</strong><br>
+Les suppressions sont définitives. Vérifiez toujours les informations avant de confirmer.
+</div>
+
+<div class="management-tabs">
+<button class="active" id="productsManageTab">📦 Produits</button>
+<button id="ordersManageTab">🧾 Commandes</button>
+<button id="artistsManageTab">🎤 Artistes</button>
+<button id="usersManageTab">👥 Utilisateurs</button>
+</div>
+</div>
+
+<!-- PRODUITS -->
+<div id="productsManageSection" class="panel">
+<h2>📦 Gestion des produits</h2>
+<p>Consultez les produits enregistrés sur la marketplace.</p>
+<input type="search" id="productsSearch" class="search-input" placeholder="Rechercher un produit...">
+<div id="productsList">Chargement...</div>
+</div>
+
+<!-- COMMANDES -->
+<div id="ordersManageSection" class="panel hidden">
+<h2>🧾 Gestion des commandes</h2>
+<p>Consultez les commandes enregistrées sur la marketplace.</p>
+<input type="search" id="ordersSearch" class="search-input" placeholder="Rechercher une commande...">
+<div id="ordersList">Chargement...</div>
+</div>
+
+<!-- ARTISTES -->
+<div id="artistsManageSection" class="panel hidden">
+<h2>🎤 Gestion des artistes</h2>
+<p>Consultez et gérez les profils artistes.</p>
+<input type="search" id="artistsSearch" class="search-input" placeholder="Rechercher un artiste...">
+<div id="artistsList">Chargement...</div>
+</div>
+
+<!-- UTILISATEURS -->
+<div id="usersManageSection" class="panel hidden">
+<h2>👥 Gestion des utilisateurs</h2>
+<p>Consultez les profils enregistrés sur Moonlight Digital.</p>
+<input type="search" id="usersSearch" class="search-input" placeholder="Rechercher un utilisateur...">
+<div id="usersList">Chargement...</div>
+</div>
+
+</div>
+
 <!-- MOONLIGHT MEDIA -->
 <div id="mediaSection" class="hidden">
 <div class="panel">
@@ -344,7 +411,6 @@ Cliquez sur « Publier un article » pour ouvrir votre interface de gestion.
 const SUPABASE_URL = "https://lmyefbevtukmtoijjlja.supabase.co";
 const SUPABASE_KEY = "sb_publishable_6t-IlMpQAslqtctUJEmwKQ_0Wf5pBJ1";
 
-/* NOUVEL IDENTIFIANT ADMINISTRATEUR PRINCIPAL */
 const ADMIN_ID = "295c4fb1-6222-4bb5-9278-c55395f7d880";
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -354,6 +420,12 @@ const dashboard = document.getElementById("dashboard");
 const message = document.getElementById("message");
 
 let currentSection = "home";
+let currentAdminId = null;
+
+let productsCache = [];
+let ordersCache = [];
+let artistsCache = [];
+let usersCache = [];
 
 function escapeHTML(value) {
   return String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -386,6 +458,10 @@ function setStat(id, value, unavailable = false) {
   } else {
     element.classList.remove("stat-unavailable");
   }
+}
+
+function emptyMessage(text) {
+  return `<div class="empty-state">${escapeHTML(text)}</div>`;
 }
 
 async function countTable(table, column = "id", filters = []) {
@@ -468,18 +544,10 @@ async function loadDashboardStats() {
   }
 
   displayCount("statUsers",users);
-
-  // Les politiques RLS actuelles ne garantissent pas
-  // un accès global aux profils artistes.
-  setStat("statArtists","Non disponible",true);
-
+  displayCount("statArtists",artists);
   displayCount("statReleases",releases);
   displayCount("statProducts",products);
-
-  // Les commandes contiennent des données personnelles.
-  // Aucun accès global ne doit être supposé ici.
-  setStat("statOrders","Non disponible",true);
-
+  displayCount("statOrders",orders);
   displayCount("statSellers",sellers);
   displayCount("statPosts",posts);
 
@@ -503,8 +571,7 @@ async function loadDashboardStats() {
 
   document.getElementById("statsMessage").textContent =
     "Dernière actualisation : " +
-    new Date().toLocaleString("fr-FR") +
-    ". Les statistiques indisponibles nécessitent une vérification des autorisations Supabase.";
+    new Date().toLocaleString("fr-FR");
 }
 
 
@@ -538,19 +605,16 @@ async function initialize() {
 
     const userId = session.user.id;
 
-    // Vérification de l'identifiant du compte administrateur.
     if(userId !== ADMIN_ID) {
 
       loading.innerHTML =
-        '<p class="error">Accès refusé : ce compte n’est pas autorisé à accéder à l’administration.</p>' +
-        '<p>Identifiant du compte connecté :</p>' +
-        '<p><strong>' + escapeHTML(userId) + '</strong></p>' +
-        '<p>Veuillez vous connecter avec le compte administrateur Moonlight Digital.</p>';
+        '<p class="error">Accès refusé : ce compte n’est pas autorisé à accéder à l’administration.</p>';
 
       return;
     }
 
-    // Le compte autorisé est reconnu.
+    currentAdminId = userId;
+
     loading.classList.add("hidden");
     dashboard.classList.remove("hidden");
 
@@ -571,31 +635,46 @@ async function initialize() {
 
 
 /* =================================
-   NAVIGATION
+   NAVIGATION PRINCIPALE
 ================================= */
 
 function showSection(section) {
 
   currentSection = section;
 
-  document.getElementById("homeSection").classList.toggle("hidden",section !== "home");
-  document.getElementById("musicSection").classList.toggle("hidden",section !== "music");
-  document.getElementById("marketSection").classList.toggle("hidden",section !== "market");
-  document.getElementById("mediaSection").classList.toggle("hidden",section !== "media");
+  const sections = [
+    "home",
+    "music",
+    "market",
+    "manage",
+    "media"
+  ];
 
-  document.getElementById("homeTab").classList.toggle("active",section === "home");
-  document.getElementById("musicTab").classList.toggle("active",section === "music");
-  document.getElementById("marketTab").classList.toggle("active",section === "market");
-  document.getElementById("mediaTab").classList.toggle("active",section === "media");
+  sections.forEach(name => {
+
+    const element = document.getElementById(name + "Section");
+    const tab = document.getElementById(name + "Tab");
+
+    if(element) {
+      element.classList.toggle("hidden",name !== section);
+    }
+
+    if(tab) {
+      tab.classList.toggle("active",name === section);
+    }
+
+  });
 
   if(section === "home") loadDashboardStats();
   if(section === "market") loadMarketplace();
   if(section === "music") loadReleases();
+  if(section === "manage") loadManagement();
 }
 
 document.getElementById("homeTab").addEventListener("click",() => showSection("home"));
 document.getElementById("musicTab").addEventListener("click",() => showSection("music"));
 document.getElementById("marketTab").addEventListener("click",() => showSection("market"));
+document.getElementById("manageTab").addEventListener("click",() => showSection("manage"));
 document.getElementById("mediaTab").addEventListener("click",() => showSection("media"));
 
 document.getElementById("refresh").addEventListener("click",async () => {
@@ -604,6 +683,8 @@ document.getElementById("refresh").addEventListener("click",async () => {
     await loadReleases();
   } else if(currentSection === "market") {
     await loadMarketplace();
+  } else if(currentSection === "manage") {
+    await loadManagement();
   } else {
     await loadDashboardStats();
   }
@@ -616,6 +697,673 @@ document.getElementById("logout").addEventListener("click",async () => {
 
   await db.auth.signOut();
   window.location.href = "espace-artiste.html";
+
+});
+
+
+/* =================================
+   GESTION DES SOUS-SECTIONS
+================================= */
+
+function showManageSection(section) {
+
+  const sections = [
+    "products",
+    "orders",
+    "artists",
+    "users"
+  ];
+
+  sections.forEach(name => {
+
+    document.getElementById(name + "ManageSection")
+      .classList.toggle("hidden",name !== section);
+
+    document.getElementById(name + "ManageTab")
+      .classList.toggle("active",name === section);
+
+  });
+
+}
+
+document.getElementById("productsManageTab").addEventListener("click",() => {
+  showManageSection("products");
+  loadProducts();
+});
+
+document.getElementById("ordersManageTab").addEventListener("click",() => {
+  showManageSection("orders");
+  loadOrders();
+});
+
+document.getElementById("artistsManageTab").addEventListener("click",() => {
+  showManageSection("artists");
+  loadArtists();
+});
+
+document.getElementById("usersManageTab").addEventListener("click",() => {
+  showManageSection("users");
+  loadUsers();
+});
+
+async function loadManagement() {
+
+  await Promise.all([
+    loadProducts(),
+    loadOrders(),
+    loadArtists(),
+    loadUsers()
+  ]);
+
+}
+
+
+/* =================================
+   SUPPRESSION SÉCURISÉE
+================================= */
+
+async function deleteRecord(table,id,label) {
+
+  const confirmed = confirm(
+    "ATTENTION !\n\n" +
+    "Voulez-vous vraiment supprimer : " + label + " ?\n\n" +
+    "Cette action est définitive."
+  );
+
+  if(!confirmed) return false;
+
+  showMessage("Suppression en cours...");
+
+  const {error} = await db
+    .from(table)
+    .delete()
+    .eq("id",id);
+
+  if(error) {
+
+    showMessage(
+      "Suppression impossible : " + error.message,
+      "error"
+    );
+
+    return false;
+  }
+
+  showMessage(label + " supprimé avec succès.");
+
+  return true;
+}
+
+
+/* =================================
+   GESTION DES PRODUITS
+================================= */
+
+async function loadProducts() {
+
+  const container = document.getElementById("productsList");
+
+  container.textContent = "Chargement des produits...";
+
+  const {data,error} = await db
+    .from("products")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error) {
+
+    container.innerHTML =
+      '<p class="error">Erreur de chargement : ' +
+      escapeHTML(error.message) + '</p>';
+
+    return;
+  }
+
+  productsCache = data || [];
+
+  renderProducts(productsCache);
+
+}
+
+function renderProducts(products) {
+
+  const container = document.getElementById("productsList");
+
+  if(!products.length) {
+    container.innerHTML = emptyMessage("Aucun produit enregistré.");
+    return;
+  }
+
+  container.innerHTML = products.map(product => `
+
+    <div class="item-card">
+
+      <h3>${escapeHTML(product.name || "Produit sans nom")}</h3>
+
+      <p><strong>Catégorie :</strong> ${escapeHTML(product.category || "Non précisée")}</p>
+
+      <p><strong>Prix :</strong> ${money(product.price)}</p>
+
+      <p><strong>Stock :</strong> ${Number(product.stock || 0)}</p>
+
+      <p><strong>Statut :</strong> <span class="badge">${escapeHTML(product.status || "Non précisé")}</span></p>
+
+      <p><strong>Description :</strong> ${escapeHTML(product.description || "Aucune description")}</p>
+
+      <p><strong>ID vendeur :</strong> ${escapeHTML(product.seller_id)}</p>
+
+      <div class="item-actions">
+        <button class="danger-button" data-delete-product="${escapeHTML(product.id)}">
+          🗑️ Supprimer ce produit
+        </button>
+      </div>
+
+    </div>
+
+  `).join("");
+
+  container.querySelectorAll("[data-delete-product]").forEach(button => {
+
+    button.addEventListener("click",async () => {
+
+      const id = button.dataset.deleteProduct;
+      const product = productsCache.find(p => p.id === id);
+
+      if(!product) return;
+
+      // Vérifier si des commandes sont liées au produit.
+      const {count,error} = await db
+        .from("orders")
+        .select("id",{count:"exact",head:true})
+        .eq("product_id",id);
+
+      if(error) {
+
+        showMessage(
+          "Impossible de vérifier les commandes liées : " + error.message,
+          "error"
+        );
+
+        return;
+      }
+
+      if(count > 0) {
+
+        alert(
+          "Ce produit possède encore " + count +
+          " commande(s).\n\n" +
+          "Supprimez d'abord les commandes liées avant de supprimer ce produit."
+        );
+
+        return;
+      }
+
+      button.disabled = true;
+
+      const success = await deleteRecord(
+        "products",
+        id,
+        product.name
+      );
+
+      button.disabled = false;
+
+      if(success) {
+        await loadProducts();
+        await loadDashboardStats();
+      }
+
+    });
+
+  });
+
+}
+
+document.getElementById("productsSearch").addEventListener("input",event => {
+
+  const term = event.target.value.toLowerCase();
+
+  renderProducts(
+    productsCache.filter(product =>
+      [
+        product.name,
+        product.category,
+        product.description,
+        product.status
+      ].some(value => String(value || "").toLowerCase().includes(term))
+    )
+  );
+
+});
+
+
+/* =================================
+   GESTION DES COMMANDES
+================================= */
+
+async function loadOrders() {
+
+  const container = document.getElementById("ordersList");
+
+  container.textContent = "Chargement des commandes...";
+
+  const [ordersResult,productsResult] = await Promise.all([
+
+    db.from("orders")
+      .select("*")
+      .order("created_at",{ascending:false}),
+
+    db.from("products")
+      .select("id,name")
+
+  ]);
+
+  if(ordersResult.error) {
+
+    container.innerHTML =
+      '<p class="error">Erreur : ' +
+      escapeHTML(ordersResult.error.message) + '</p>';
+
+    return;
+  }
+
+  if(productsResult.error) {
+
+    container.innerHTML =
+      '<p class="error">Impossible de charger les produits associés : ' +
+      escapeHTML(productsResult.error.message) + '</p>';
+
+    return;
+  }
+
+  const productMap = {};
+
+  (productsResult.data || []).forEach(product => {
+    productMap[product.id] = product.name;
+  });
+
+  ordersCache = ordersResult.data || [];
+
+  renderOrders(ordersCache,productMap);
+
+}
+
+function renderOrders(orders,productMap = {}) {
+
+  const container = document.getElementById("ordersList");
+
+  if(!orders.length) {
+    container.innerHTML = emptyMessage("Aucune commande enregistrée.");
+    return;
+  }
+
+  container.innerHTML = orders.map(order => `
+
+    <div class="item-card">
+
+      <h3>Commande #${escapeHTML(order.id.slice(0,8))}</h3>
+
+      <p><strong>Produit :</strong> ${escapeHTML(productMap[order.product_id] || "Produit introuvable ou supprimé")}</p>
+
+      <p><strong>Client :</strong> ${escapeHTML(order.buyer_name || "Non renseigné")}</p>
+
+      <p><strong>Téléphone :</strong> ${escapeHTML(order.buyer_phone || "Non renseigné")}</p>
+
+      <p><strong>Adresse :</strong> ${escapeHTML(order.buyer_address || "Non renseignée")}</p>
+
+      <p><strong>Quantité :</strong> ${Number(order.quantity || 0)}</p>
+
+      <p><strong>Prix unitaire :</strong> ${money(order.unit_price)}</p>
+
+      <p><strong>Total :</strong> ${money(order.total_amount)}</p>
+
+      <p><strong>Commission :</strong> ${money(order.platform_commission)}</p>
+
+      <p><strong>Part vendeur :</strong> ${money(order.seller_amount)}</p>
+
+      <p><strong>Statut :</strong> <span class="badge">${escapeHTML(order.status || "Non précisé")}</span></p>
+
+      <p><strong>Date :</strong> ${escapeHTML(order.created_at ? new Date(order.created_at).toLocaleString("fr-FR") : "Non précisée")}</p>
+
+      <p><strong>Note du client :</strong> ${escapeHTML(order.buyer_note || "Aucune")}</p>
+
+      <div class="item-actions">
+        <button class="danger-button" data-delete-order="${escapeHTML(order.id)}">
+          🗑️ Supprimer cette commande
+        </button>
+      </div>
+
+    </div>
+
+  `).join("");
+
+  container.querySelectorAll("[data-delete-order]").forEach(button => {
+
+    button.addEventListener("click",async () => {
+
+      const id = button.dataset.deleteOrder;
+      const order = ordersCache.find(o => o.id === id);
+
+      if(!order) return;
+
+      button.disabled = true;
+
+      const success = await deleteRecord(
+        "orders",
+        id,
+        "la commande #" + id.slice(0,8)
+      );
+
+      button.disabled = false;
+
+      if(success) {
+        await loadOrders();
+        await loadDashboardStats();
+        await loadProducts();
+      }
+
+    });
+
+  });
+
+}
+
+document.getElementById("ordersSearch").addEventListener("input",event => {
+
+  const term = event.target.value.toLowerCase();
+
+  const filtered = ordersCache.filter(order =>
+
+    [
+      order.id,
+      order.buyer_name,
+      order.buyer_phone,
+      order.buyer_address,
+      order.status
+    ].some(value => String(value || "").toLowerCase().includes(term))
+
+  );
+
+  renderOrders(filtered);
+
+});
+
+
+/* =================================
+   GESTION DES ARTISTES
+================================= */
+
+async function loadArtists() {
+
+  const container = document.getElementById("artistsList");
+
+  container.textContent = "Chargement des artistes...";
+
+  const {data,error} = await db
+    .from("artists")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error) {
+
+    container.innerHTML =
+      '<p class="error">Erreur : ' +
+      escapeHTML(error.message) + '</p>';
+
+    return;
+  }
+
+  artistsCache = data || [];
+
+  renderArtists(artistsCache);
+
+}
+
+function renderArtists(artists) {
+
+  const container = document.getElementById("artistsList");
+
+  if(!artists.length) {
+    container.innerHTML = emptyMessage("Aucun profil artiste enregistré.");
+    return;
+  }
+
+  container.innerHTML = artists.map(artist => `
+
+    <div class="item-card">
+
+      <h3>🎤 ${escapeHTML(artist.artist_name || "Artiste sans nom")}</h3>
+
+      <p><strong>Biographie :</strong> ${escapeHTML(artist.bio || "Aucune biographie")}</p>
+
+      <p><strong>ID du profil :</strong> ${escapeHTML(artist.id)}</p>
+
+      <p><strong>ID utilisateur :</strong> ${escapeHTML(artist.user_id)}</p>
+
+      <p><strong>Inscription :</strong> ${escapeHTML(artist.created_at ? new Date(artist.created_at).toLocaleDateString("fr-FR") : "Non précisée")}</p>
+
+      ${artist.profile_image_url
+        ? `<p><img src="${escapeHTML(artist.profile_image_url)}" class="cover" alt="Photo artiste"></p>`
+        : ""
+      }
+
+      <div class="item-actions">
+        <button class="danger-button" data-delete-artist="${escapeHTML(artist.id)}">
+          🗑️ Supprimer le profil artiste
+        </button>
+      </div>
+
+    </div>
+
+  `).join("");
+
+  container.querySelectorAll("[data-delete-artist]").forEach(button => {
+
+    button.addEventListener("click",async () => {
+
+      const id = button.dataset.deleteArtist;
+      const artist = artistsCache.find(a => a.id === id);
+
+      if(!artist) return;
+
+      const confirmed = confirm(
+        "ATTENTION !\n\n" +
+        "Voulez-vous supprimer le profil de " +
+        (artist.artist_name || "cet artiste") + " ?\n\n" +
+        "Les morceaux associés à ce profil dans tracks seront également supprimés automatiquement.\n\n" +
+        "Le profil utilisateur dans profiles ne sera pas supprimé."
+      );
+
+      if(!confirmed) return;
+
+      button.disabled = true;
+
+      const {error} = await db
+        .from("artists")
+        .delete()
+        .eq("id",id);
+
+      button.disabled = false;
+
+      if(error) {
+
+        showMessage("Erreur : " + error.message,"error");
+        return;
+      }
+
+      showMessage("Profil artiste supprimé avec succès.");
+
+      await loadArtists();
+      await loadDashboardStats();
+
+    });
+
+  });
+
+}
+
+document.getElementById("artistsSearch").addEventListener("input",event => {
+
+  const term = event.target.value.toLowerCase();
+
+  renderArtists(
+    artistsCache.filter(artist =>
+      [
+        artist.artist_name,
+        artist.bio,
+        artist.user_id
+      ].some(value => String(value || "").toLowerCase().includes(term))
+    )
+  );
+
+});
+
+
+/* =================================
+   GESTION DES UTILISATEURS
+================================= */
+
+async function loadUsers() {
+
+  const container = document.getElementById("usersList");
+
+  container.textContent = "Chargement des utilisateurs...";
+
+  const {data,error} = await db
+    .from("profiles")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error) {
+
+    container.innerHTML =
+      '<p class="error">Erreur : ' +
+      escapeHTML(error.message) + '</p>';
+
+    return;
+  }
+
+  usersCache = data || [];
+
+  renderUsers(usersCache);
+
+}
+
+function renderUsers(users) {
+
+  const container = document.getElementById("usersList");
+
+  if(!users.length) {
+    container.innerHTML = emptyMessage("Aucun utilisateur enregistré.");
+    return;
+  }
+
+  container.innerHTML = users.map(user => {
+
+    const isAdmin = user.id === currentAdminId;
+
+    return `
+
+      <div class="item-card">
+
+        <h3>👤 ${escapeHTML(user.full_name || user.artist_name || "Utilisateur sans nom")}</h3>
+
+        <p><strong>Nom artiste :</strong> ${escapeHTML(user.artist_name || "Non renseigné")}</p>
+
+        <p><strong>Téléphone :</strong> ${escapeHTML(user.phone || "Non renseigné")}</p>
+
+        <p><strong>Pays :</strong> ${escapeHTML(user.country || "Non renseigné")}</p>
+
+        <p><strong>Rôle :</strong> <span class="badge">${escapeHTML(user.role || "Utilisateur")}</span></p>
+
+        <p><strong>ID utilisateur :</strong> ${escapeHTML(user.id)}</p>
+
+        <p><strong>Inscription :</strong> ${escapeHTML(user.created_at ? new Date(user.created_at).toLocaleDateString("fr-FR") : "Non précisée")}</p>
+
+        <div class="item-actions">
+
+          ${isAdmin
+
+            ? '<button disabled>🔒 Votre profil administrateur est protégé</button>'
+
+            : `<button class="danger-button" data-delete-user="${escapeHTML(user.id)}">
+                🗑️ Supprimer ce profil
+              </button>`
+
+          }
+
+        </div>
+
+      </div>
+
+    `;
+
+  }).join("");
+
+  container.querySelectorAll("[data-delete-user]").forEach(button => {
+
+    button.addEventListener("click",async () => {
+
+      const id = button.dataset.deleteUser;
+      const user = usersCache.find(u => u.id === id);
+
+      if(!user || id === currentAdminId) return;
+
+      const name = user.full_name || user.artist_name || "cet utilisateur";
+
+      const confirmed = confirm(
+        "ATTENTION !\n\n" +
+        "Voulez-vous supprimer le profil de " + name + " ?\n\n" +
+        "Le profil artiste associé et ses morceaux seront également supprimés si les relations CASCADE s'appliquent.\n\n" +
+        "Le compte de connexion Supabase Authentication ne sera PAS supprimé.\n\n" +
+        "Cette action est définitive."
+      );
+
+      if(!confirmed) return;
+
+      button.disabled = true;
+
+      const {error} = await db
+        .from("profiles")
+        .delete()
+        .eq("id",id);
+
+      button.disabled = false;
+
+      if(error) {
+
+        showMessage("Erreur : " + error.message,"error");
+        return;
+      }
+
+      showMessage("Profil utilisateur supprimé avec succès.");
+
+      await loadUsers();
+      await loadArtists();
+      await loadDashboardStats();
+
+    });
+
+  });
+
+}
+
+document.getElementById("usersSearch").addEventListener("input",event => {
+
+  const term = event.target.value.toLowerCase();
+
+  renderUsers(
+    usersCache.filter(user =>
+      [
+        user.full_name,
+        user.artist_name,
+        user.phone,
+        user.country,
+        user.role,
+        user.id
+      ].some(value => String(value || "").toLowerCase().includes(term))
+    )
+  );
 
 });
 
@@ -846,7 +1594,7 @@ async function loadMarketplace() {
           <td>
             ${isPaid
               ? "—"
-              : `<button class="pay-button" onclick="markAsPaid('${s.id}')">Marquer payée</button>`
+              : `<button class="pay-button" onclick="markAsPaid('${escapeHTML(s.id)}')">Marquer payée</button>`
             }
           </td>
         </tr>
